@@ -45,10 +45,10 @@ function ParentsPage() {
     mutationFn: (id: number) => parentApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["parents"] })
-      toast.success("Parent deleted")
+      toast.success("تم حذف ولي الأمر")
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to delete parent")
+      toast.error(err?.response?.data?.message || "فشل حذف ولي الأمر")
     },
   })
 
@@ -58,21 +58,21 @@ function ParentsPage() {
 
   return (
     <div>
-      <PageHeader title="Parents" description="Manage parent accounts and profiles.">
+      <PageHeader title="أولياء الأمور" description="إدارة حسابات أولياء الأمور وملفاتهم.">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search parents..."
+            placeholder="بحث عن ولي أمر..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-64 pl-9"
+            className="w-64 pr-9"
           />
         </div>
         {canManage && (
           <a href="/parents/new">
             <Button>
               <Plus className="h-4 w-4" />
-              New Parent
+              ولي أمر جديد
             </Button>
           </a>
         )}
@@ -86,8 +86,8 @@ function ParentsPage() {
             <Inbox className="h-7 w-7" />
           </span>
           <div>
-            <p className="text-base font-medium text-foreground">{search ? "No results" : "No parents found"}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{search ? "No parents match your search." : "Create a parent account to get started."}</p>
+            <p className="text-base font-medium text-foreground">{search ? "لا توجد نتائج" : "لم يتم العثور على أولياء أمور"}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{search ? "لا يوجد أولياء أمور يطابقون بحثك." : "أنشئ حساب ولي أمر للبدء."}</p>
           </div>
         </div>
       ) : (
@@ -95,12 +95,12 @@ function ParentsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Children</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="w-24">Actions</TableHead>
+                <TableHead>الاسم</TableHead>
+                <TableHead>البريد الإلكتروني</TableHead>
+                <TableHead>الأبناء</TableHead>
+                <TableHead>الهاتف</TableHead>
+                <TableHead>الحالة</TableHead>
+                <TableHead className="w-24">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

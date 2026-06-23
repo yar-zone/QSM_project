@@ -68,10 +68,10 @@ function NewParentPage() {
         phone: values.phone || undefined,
         student_ids: selectedStudents,
       })
-      toast.success("Parent created")
+      toast.success("تم إنشاء ولي الأمر")
       navigate({ to: "/parents" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to create parent")
+      toast.error(err?.response?.data?.message || "فشل إنشاء ولي الأمر")
     } finally {
       setSaving(false)
     }
@@ -79,46 +79,46 @@ function NewParentPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="New Parent" description="Create a new parent account.">
+      <PageHeader title="ولي أمر جديد" description="إنشاء حساب ولي أمر جديد.">
         <a href="/parents">
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4" />
-            Back
+            رجوع
           </Button>
         </a>
       </PageHeader>
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
-          <CardTitle>Parent Details</CardTitle>
+          <CardTitle>بيانات ولي الأمر</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">الاسم الكامل</Label>
               <Input id="name" {...register("name")} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">البريد الإلكتروني</Label>
               <Input id="email" type="email" {...register("email")} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">كلمة المرور</Label>
               <Input id="password" type="password" {...register("password")} />
               {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password_confirmation">Confirm Password</Label>
+              <Label htmlFor="password_confirmation">تأكيد كلمة المرور</Label>
               <Input id="password_confirmation" type="password" {...register("password_confirmation")} />
               {errors.password_confirmation && <p className="text-xs text-destructive">{errors.password_confirmation.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">الهاتف</Label>
               <Input id="phone" type="tel" {...register("phone")} />
             </div>
             <div className="space-y-1.5">
-              <Label>Linked Students</Label>
+              <Label>الطلاب المرتبطون</Label>
               {students && students.length > 0 ? (
                 <div className="max-h-48 overflow-y-auto rounded-md border p-2 space-y-1">
                   {students.map((s) => (
@@ -134,12 +134,12 @@ function NewParentPage() {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No students available.</p>
+                <p className="text-sm text-muted-foreground">لا يوجد طلاب متاحون.</p>
               )}
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Parent
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              إنشاء ولي أمر
             </Button>
           </form>
         </CardContent>

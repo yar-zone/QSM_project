@@ -32,15 +32,15 @@ function AuthPage() {
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-white shadow-lg shadow-primary/25">
             <BookOpen className="h-7 w-7" />
           </span>
-          <h1 className="mt-4 text-2xl font-bold text-foreground">Nur Quran</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Quran School Management</p>
+          <h1 className="mt-4 text-2xl font-bold text-foreground">نور القرآن</h1>
+          <p className="mt-1 text-sm text-muted-foreground">إدارة المدرسة القرآنية</p>
         </div>
 
         <div className="rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-card)]">
           <div className="mb-6 text-center">
-            <h2 className="text-xl font-semibold text-foreground">{mode === "register" ? "Create an account" : "Welcome back"}</h2>
+            <h2 className="text-xl font-semibold text-foreground">{mode === "register" ? "إنشاء حساب" : "مرحباً بعودتك"}</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              {mode === "register" ? "Register and an administrator will approve your account." : "Sign in to continue to your dashboard."}
+              {mode === "register" ? "سجّل وسيقوم المدير باعتماد حسابك." : "سجل الدخول للمتابعة إلى لوحة التحكم."}
             </p>
           </div>
 
@@ -48,9 +48,9 @@ function AuthPage() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             {mode === "register" ? (
-              <>Already have an account? <button onClick={() => setMode("login")} className="font-medium text-primary underline-offset-4 hover:underline">Sign in</button></>
+              <>هل لديك حساب بالفعل؟ <button onClick={() => setMode("login")} className="font-medium text-primary underline-offset-4 hover:underline">تسجيل الدخول</button></>
             ) : (
-              <>New here? <button onClick={() => setMode("register")} className="font-medium text-primary underline-offset-4 hover:underline">Create an account</button></>
+              <>جديد هنا؟ <button onClick={() => setMode("register")} className="font-medium text-primary underline-offset-4 hover:underline">إنشاء حساب</button></>
             )}
           </p>
         </div>
@@ -69,16 +69,16 @@ function LoginForm() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email.trim()) { setError("Email is required"); return }
-    if (!password) { setError("Password is required"); return }
+    if (!email.trim()) { setError("البريد الإلكتروني مطلوب"); return }
+    if (!password) { setError("كلمة المرور مطلوبة"); return }
     setSubmitting(true)
     setError(null)
     try {
       await login(email.trim(), password)
-      toast.success("Signed in")
+      toast.success("تم تسجيل الدخول")
       navigate({ to: "/dashboard" })
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || "Login failed"
+      const msg = err?.response?.data?.message || err?.message || "فشل تسجيل الدخول"
       setError(msg)
       toast.error(msg)
     } finally {
@@ -89,17 +89,17 @@ function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" placeholder="you@example.com" />
+        <Label htmlFor="email">البريد الإلكتروني</Label>
+        <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" placeholder="بريدك@example.com" />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">كلمة المرور</Label>
         <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
       <Button type="submit" disabled={submitting} className="w-full">
-        {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Sign in
+        {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+        تسجيل الدخول
       </Button>
     </form>
   )
@@ -119,16 +119,16 @@ function RegisterForm() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    if (!name.trim()) { setError("Name is required"); return }
-    if (!email.trim()) { setError("Email is required"); return }
-    if (!password || password.length < 6) { setError("Password must be at least 6 characters"); return }
+    if (!name.trim()) { setError("الاسم مطلوب"); return }
+    if (!email.trim()) { setError("البريد الإلكتروني مطلوب"); return }
+    if (!password || password.length < 6) { setError("كلمة المرور يجب أن تكون 6 أحرف على الأقل"); return }
     setSubmitting(true)
     try {
       await signUp({ name: name.trim(), email: email.trim(), password, password_confirmation: password, role, phone: phone.trim() || undefined })
-      toast.success("Account created! Awaiting approval.")
+      toast.success("تم إنشاء الحساب! بانتظار الموافقة.")
       navigate({ to: "/dashboard" })
     } catch (err: any) {
-      const msg = err?.response?.data?.message || err?.message || "Registration failed"
+      const msg = err?.response?.data?.message || err?.message || "فشل التسجيل"
       setError(msg)
       toast.error(msg)
     } finally {
@@ -139,7 +139,7 @@ function RegisterForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div className="space-y-1.5">
-        <Label>I am registering as</Label>
+        <Label>أنا أسجل كـ</Label>
         <div className="grid grid-cols-3 gap-2">
           {(["teacher", "student", "parent"] as const).map(r => (
             <button key={r} type="button" onClick={() => setRole(r)}
@@ -148,31 +148,31 @@ function RegisterForm() {
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
                   : "border-border bg-background text-foreground hover:bg-accent"
               }`}>
-              {r.charAt(0).toUpperCase() + r.slice(1)}
+              {{ teacher: "معلم", student: "طالب", parent: "ولي أمر" }[r]}
             </button>
           ))}
         </div>
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="name">Full name</Label>
-        <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" />
+        <Label htmlFor="name">الاسم الكامل</Label>
+        <Input id="name" value={name} onChange={e => setName(e.target.value)} placeholder="اسمك الكامل" />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" placeholder="you@example.com" />
+        <Label htmlFor="email">البريد الإلكتروني</Label>
+        <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" placeholder="بريدك@example.com" />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="phone">Phone (optional)</Label>
-        <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" />
+        <Label htmlFor="phone">الهاتف (اختياري)</Label>
+        <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="05XX XXX XXXX" />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="password">Password</Label>
-        <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" placeholder="Min. 6 characters" />
+        <Label htmlFor="password">كلمة المرور</Label>
+        <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" placeholder="6 أحرف على الأقل" />
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
       <Button type="submit" disabled={submitting} className="w-full">
-        {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-        Create account
+        {submitting && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+        إنشاء حساب
       </Button>
     </form>
   )

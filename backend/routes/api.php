@@ -151,6 +151,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('attendances/{attendance}', [AttendanceController::class, 'destroy']);
         Route::post('attendances/bulk', [AttendanceController::class, 'bulkStore']);
         Route::get('attendances/reports', [AttendanceController::class, 'reports']);
+        Route::get('attendances/class-reports', [AttendanceController::class, 'classReports']);
     });
     Route::middleware('role:admin,organizer,teacher,student,parent')->group(function () {
         Route::get('attendances', [AttendanceController::class, 'index']);

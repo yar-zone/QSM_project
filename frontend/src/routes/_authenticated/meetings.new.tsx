@@ -72,10 +72,10 @@ function NewMeetingPage() {
         target_teachers: values.target_teachers || undefined,
         target_organizers: values.target_organizers || undefined,
       })
-      toast.success("Meeting created")
+      toast.success("تم إنشاء الاجتماع")
       navigate({ to: "/meetings" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to create meeting")
+      toast.error(err?.response?.data?.message || "فشل إنشاء الاجتماع")
     } finally {
       setSaving(false)
     }
@@ -83,24 +83,24 @@ function NewMeetingPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="New Meeting" description="Schedule a new meeting." />
+      <PageHeader title="اجتماع جديد" description="جدولة اجتماع جديد." />
       <Card className="shadow-[var(--shadow-card)]">
-        <CardHeader><CardTitle>Meeting Details</CardTitle></CardHeader>
+        <CardHeader><CardTitle>تفاصيل الاجتماع</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">العنوان</Label>
               <Input id="title" {...register("title")} />
               {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">الوصف</Label>
               <Textarea id="description" rows={3} {...register("description")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="platform">Platform</Label>
+              <Label htmlFor="platform">المنصة</Label>
               <Select onValueChange={(v) => setValue("platform", v)} defaultValue="Jitsi">
-                <SelectTrigger><SelectValue placeholder="Select platform" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="اختر منصة" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Jitsi">Jitsi</SelectItem>
                   <SelectItem value="Zoom">Zoom</SelectItem>
@@ -110,22 +110,22 @@ function NewMeetingPage() {
               {errors.platform && <p className="text-xs text-destructive">{errors.platform.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="meeting_link">Meeting Link</Label>
+              <Label htmlFor="meeting_link">رابط الاجتماع</Label>
               <Input id="meeting_link" type="url" {...register("meeting_link")} placeholder="https://meet.google.com/..." />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="scheduled_at">Scheduled At</Label>
+              <Label htmlFor="scheduled_at">المجدول في</Label>
               <Input id="scheduled_at" type="datetime-local" {...register("scheduled_at")} />
               {errors.scheduled_at && <p className="text-xs text-destructive">{errors.scheduled_at.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="duration_minutes">Duration (minutes)</Label>
+              <Label htmlFor="duration_minutes">المدة (دقائق)</Label>
               <Input id="duration_minutes" type="number" min={1} {...register("duration_minutes")} />
               {errors.duration_minutes && <p className="text-xs text-destructive">{errors.duration_minutes.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label>Target Classes</Label>
-              <p className="text-xs text-muted-foreground">Select classes that will see this meeting.</p>
+              <Label>الفصول المستهدفة</Label>
+              <p className="text-xs text-muted-foreground">اختر الفصول التي ستشاهد هذا الاجتماع.</p>
               <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border rounded-md p-2">
                 {(classes ?? []).map((c: Classe) => (
                   <div key={c.id} className="flex items-center gap-2">
@@ -145,8 +145,8 @@ function NewMeetingPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Target Teachers</Label>
-              <p className="text-xs text-muted-foreground">Select teachers that will see this meeting.</p>
+              <Label>المعلمون المستهدفون</Label>
+              <p className="text-xs text-muted-foreground">اختر المعلمين الذين سيشاهدون هذا الاجتماع.</p>
               <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border rounded-md p-2">
                 {(teachers ?? []).map((t: Teacher) => (
                   <div key={t.id} className="flex items-center gap-2">
@@ -166,8 +166,8 @@ function NewMeetingPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Target Organizers</Label>
-              <p className="text-xs text-muted-foreground">Select organizers that will see this meeting.</p>
+              <Label>المنظمون المستهدفون</Label>
+              <p className="text-xs text-muted-foreground">اختر المنظمين الذين سيشاهدون هذا الاجتماع.</p>
               <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border rounded-md p-2">
                 {(organizers ?? []).map((o: Organizer) => (
                   <div key={o.id} className="flex items-center gap-2">
@@ -187,8 +187,8 @@ function NewMeetingPage() {
               </div>
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Meeting
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              إنشاء اجتماع
             </Button>
           </form>
         </CardContent>

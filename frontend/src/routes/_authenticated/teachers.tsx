@@ -1,7 +1,8 @@
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
-import { useQuery } from "@tanstack/react-query"
-import { Loader2, Plus, Inbox, Pencil, Search } from "lucide-react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { Loader2, Plus, Inbox, Pencil, Trash2, Search } from "lucide-react"
 import { useState, useMemo } from "react"
+import { toast } from "sonner"
 
 import { useAuth } from "@/hooks/use-auth"
 
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/teachers")({
   component: TeachersPage,
@@ -20,12 +22,25 @@ export const Route = createFileRoute("/_authenticated/teachers")({
 
 function TeachersPage() {
   const { isAdmin, isOrganizer } = useAuth()
+  const canManage = isAdmin || isOrganizer
+  const queryClient = useQueryClient()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isChildRoute = pathname !== "/teachers"
   const [search, setSearch] = useState("")
+  const [deleteId, setDeleteId] = useState<number | null>(null)
   const { data, isLoading } = useQuery({
     queryKey: ["teachers"],
     queryFn: () => teacherApi.list(),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => teacherApi.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["teachers"] })
+      toast.success("تم حذف المعلم")
+      setDeleteId(null)
+    },
+    onError: (err: any) => toast.error(err?.response?.data?.message || "فشل حذف المعلم"),
   })
 
   const teachersList = data ?? []
@@ -42,21 +57,21 @@ function TeachersPage() {
 
   return (
     <div>
-      <PageHeader title="Teachers" description="Manage teacher accounts and profiles.">
+      <PageHeader title="المعلمون" description="إدارة حسابات المعلمين وملفاتهم.">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search teachers..."
+            placeholder="بحث عن معلم..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-64 pl-9"
+            className="w-64 pr-9"
           />
         </div>
         {(isAdmin || isOrganizer) && (
           <a href="/teachers/new">
             <Button>
               <Plus className="h-4 w-4" />
-              New Teacher
+              معلم جديد
             </Button>
           </a>
         )}
@@ -70,7 +85,7 @@ function TeachersPage() {
         <Card>
           <CardContent className="grid place-items-center gap-2 py-16 text-center text-muted-foreground">
             <Inbox className="h-8 w-8" />
-            <p>{search ? "No teachers match your search." : "No teachers found."}</p>
+            <p>{search ? "لا يوجد معلمون يطابقون بحثك." : "لم يتم العثور على معلمين."}</p>
           </CardContent>
         </Card>
       ) : (
@@ -79,12 +94,12 @@ function TeachersPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Qualification</TableHead>
-                  <TableHead>Specialization</TableHead>
-                  <TableHead>Status</TableHead>
-                  {(isAdmin || isOrganizer) && <TableHead className="w-24">Actions</TableHead>}
+                  <TableHead>الاسم</TableHead>
+                  <TableHead>البريد الإلكتروني</TableHead>
+                  <TableHead>المؤهل</TableHead>
+                  <TableHead>التخصص</TableHead>
+                  <TableHead>الحالة</TableHead>
+                  {canManage && <TableHead className="w-32 text-center">الإجراءات</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -96,16 +111,41 @@ function TeachersPage() {
                     <TableCell>{t.specialization ?? "—"}</TableCell>
                     <TableCell>
                       <Badge variant={t.is_active ? "default" : "secondary"}>
-                        {t.is_active ? "Active" : "Inactive"}
+                        {t.is_active ? "نشط" : "غير نشط"}
                       </Badge>
                     </TableCell>
-                    {(isAdmin || isOrganizer) && (
+                    {canManage && (
                       <TableCell>
-                        <a href={`/teachers/${t.id}/edit`}>
-                          <Button variant="outline" size="icon">
-                            <Pencil className="h-4 w-4" />
-                          </Button>
-                        </a>
+                        <div className="flex items-center justify-center gap-1">
+                          <a href={`/teachers/${t.id}/edit`}>
+                            <Button variant="ghost" size="icon">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </a>
+                          <Dialog open={deleteId === t.id} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => setDeleteId(t.id)}>
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader><DialogTitle>تأكيد الحذف</DialogTitle>
+                                <DialogDescription>هل أنت متأكد من حذف المعلم {t.user?.name}؟ لا يمكن التراجع عن هذا الإجراء.</DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setDeleteId(null)}>إلغاء</Button>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => deleteMutation.mutate(t.id)}
+                                  disabled={deleteMutation.isPending}
+                                >
+                                  {deleteMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                  حذف
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                       </TableCell>
                     )}
                   </TableRow>

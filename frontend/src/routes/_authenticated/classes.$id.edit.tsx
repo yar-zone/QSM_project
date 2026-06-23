@@ -75,10 +75,10 @@ function EditClassPage() {
         max_students: values.max_students || undefined,
         description: values.description || undefined,
       })
-      toast.success("Class updated")
+      toast.success("تم تحديث الفصل")
       navigate({ to: "/classes" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update class")
+      toast.error(err?.response?.data?.message || "فشل تحديث الفصل")
     } finally {
       setSaving(false)
     }
@@ -94,34 +94,34 @@ function EditClassPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="Edit Class" description={`Editing ${cls?.name ?? "class"}.`}>
+      <PageHeader title="تعديل الفصل" description={`تعديل ${cls?.name ?? "الفصل"}.`}>
         <Button variant="outline" asChild>
           <a href="/classes">
             <ArrowLeft className="h-4 w-4" />
-            Back
+            رجوع
           </a>
         </Button>
       </PageHeader>
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
-          <CardTitle>Class Details</CardTitle>
+          <CardTitle>بيانات الفصل</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">الاسم</Label>
               <Input id="name" {...register("name")} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="level_id">Level</Label>
+              <Label htmlFor="level_id">المستوى</Label>
               <Controller
                 name="level_id"
                 control={control}
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a level" />
+                      <SelectValue placeholder="اختر مستوى" />
                     </SelectTrigger>
                     <SelectContent>
                       {levels.map((l) => (
@@ -134,14 +134,14 @@ function EditClassPage() {
               {errors.level_id && <p className="text-xs text-destructive">{errors.level_id.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="teacher_id">Teacher</Label>
+              <Label htmlFor="teacher_id">المعلم</Label>
               <Controller
                 name="teacher_id"
                 control={control}
                 render={({ field }) => (
                   <Select onValueChange={field.onChange} value={field.value}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a teacher" />
+                      <SelectValue placeholder="اختر معلماً" />
                     </SelectTrigger>
                     <SelectContent>
                       {teachers.map((t) => (
@@ -154,23 +154,23 @@ function EditClassPage() {
               {errors.teacher_id && <p className="text-xs text-destructive">{errors.teacher_id.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="academic_year">Academic Year</Label>
-              <Input id="academic_year" {...register("academic_year")} placeholder="e.g. 2025-2026" />
+              <Label htmlFor="academic_year">السنة الدراسية</Label>
+              <Input id="academic_year" {...register("academic_year")} placeholder="مثال: 2025-2026" />
               {errors.academic_year && <p className="text-xs text-destructive">{errors.academic_year.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="max_students">Max Students</Label>
+              <Label htmlFor="max_students">الحد الأقصى للطلاب</Label>
               <Input id="max_students" type="number" {...register("max_students")} />
               {errors.max_students && <p className="text-xs text-destructive">{errors.max_students.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">الوصف</Label>
               <Textarea id="description" {...register("description")} />
               {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              حفظ التغييرات
             </Button>
           </form>
         </CardContent>

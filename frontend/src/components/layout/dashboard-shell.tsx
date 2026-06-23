@@ -33,7 +33,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
     navigate({ to: "/auth", search: { mode: "login" }, replace: true })
   }
 
-  const name = user?.name || user?.email || "Member"
+  const name = user?.name || user?.email || "عضو"
   const email = user?.email || ""
   const approved = !user || APPROVED_STATUSES.includes(user.status) || primaryRole === "admin"
 
@@ -45,7 +45,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           <SidebarTrigger />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 rounded-full p-1 pr-3 hover:bg-accent transition-colors">
+              <button className="flex items-center gap-2 rounded-full p-1 pl-3 hover:bg-accent transition-colors">
                 <Avatar className="h-8 w-8 ring-2 ring-primary/20">
                   <AvatarFallback className="bg-primary text-primary-foreground text-xs font-medium">
                     {initials(name, email)}
@@ -62,8 +62,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign out
+                <LogOut className="ml-2 h-4 w-4" />
+                تسجيل الخروج
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -74,7 +74,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
             <div className="grid min-h-[60vh] place-items-center">
               <div className="flex flex-col items-center gap-3 text-muted-foreground">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                <p className="text-sm">Loading your dashboard&hellip;</p>
+                <p className="text-sm">جاري تحميل لوحة التحكم…</p>
               </div>
             </div>
           ) : approved ? (
@@ -97,15 +97,15 @@ function PendingScreen({ status, onSignOut }: { status: string; onSignOut: () =>
           {rejected ? <XCircle className="h-7 w-7" /> : <Clock className="h-7 w-7" />}
         </span>
         <h2 className="mt-4 text-xl font-semibold text-foreground">
-          {rejected ? "Account not approved" : "Awaiting approval"}
+          {rejected ? "الحساب غير معتمد" : "بانتظار الموافقة"}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           {rejected
-            ? "Your registration was not approved. Please contact your school administrator."
-            : "Your account has been created and is pending review. You'll gain access as soon as it's approved."}
+            ? "لم يتم اعتماد تسجيلك. يرجى الاتصال بإدارة المدرسة."
+            : "تم إنشاء حسابك وهو قيد المراجعة. ستحصل على الوصول بمجرد اعتماده."}
         </p>
         <Button variant="outline" className="mt-6" onClick={onSignOut}>
-          <LogOut className="mr-2 h-4 w-4" /> Sign out
+          <LogOut className="ml-2 h-4 w-4" /> تسجيل الخروج
         </Button>
       </div>
     </div>

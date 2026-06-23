@@ -12,6 +12,8 @@ class ExamResult extends Model
 
     protected $fillable = [
         'exam_request_id',
+        'student_id',
+        'level_id',
         'marks_obtained',
         'grade',
         'evaluator_notes',
@@ -32,6 +34,16 @@ class ExamResult extends Model
     public function examRequest(): BelongsTo
     {
         return $this->belongsTo(ExamRequest::class);
+    }
+
+    public function student(): BelongsTo
+    {
+        return $this->belongsTo(Student::class);
+    }
+
+    public function level(): BelongsTo
+    {
+        return $this->belongsTo(Level::class);
     }
 
     public function evaluatedBy(): BelongsTo

@@ -17,19 +17,19 @@ export const SELF_SIGNUP_ROLES: readonly AppRole[] = [
 ] as const;
 
 export const ROLE_LABELS: Record<AppRole, string> = {
-  admin: "Administrator",
-  organizer: "Organizer",
-  teacher: "Teacher",
-  student: "Student",
-  parent: "Parent",
+  admin: "مدير",
+  organizer: "منظم",
+  teacher: "معلم",
+  student: "طالب",
+  parent: "ولي أمر",
 };
 
 export const ROLE_DESCRIPTIONS: Record<AppRole, string> = {
-  admin: "Full access to the entire platform.",
-  organizer: "Manage students, teachers, exams and announcements.",
-  teacher: "Track memorization, attendance and evaluations.",
-  student: "Follow your memorization journey and results.",
-  parent: "Monitor your child's progress and activities.",
+  admin: "وصول كامل للمنصة بأكملها.",
+  organizer: "إدارة الطلاب والمعلمين والامتحانات والإعلانات.",
+  teacher: "تتبع الحفظ والحضور والتقييمات.",
+  student: "تابع رحلة حفظك ونتائجك.",
+  parent: "راقب تقدم وأنشطة طفلك.",
 };
 
 /** Priority order used to pick a single primary role for routing/UI. */

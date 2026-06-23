@@ -17,12 +17,12 @@ import {
 } from 'lucide-react'
 
 const navItems = [
-  { label: 'Dashboard', path: '', icon: LayoutDashboard },
-  { label: 'Students', path: '/students', icon: Users },
-  { label: 'Teachers', path: '/teachers', icon: GraduationCap },
-  { label: 'Classes', path: '/classes', icon: BookOpen },
-  { label: 'Attendance', path: '/attendance', icon: CalendarCheck },
-  { label: 'Payments', path: '/payments', icon: CreditCard },
+  { label: 'لوحة التحكم', path: '', icon: LayoutDashboard },
+  { label: 'الطلاب', path: '/students', icon: Users },
+  { label: 'المعلمون', path: '/teachers', icon: GraduationCap },
+  { label: 'الفصول', path: '/classes', icon: BookOpen },
+  { label: 'الحضور', path: '/attendance', icon: CalendarCheck },
+  { label: 'المدفوعات', path: '/payments', icon: CreditCard },
 ]
 
 export default function AppLayout() {
@@ -41,12 +41,12 @@ export default function AppLayout() {
     <div className="flex h-screen overflow-hidden bg-background">
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-64 transform bg-white shadow-lg transition-transform duration-200 lg:relative lg:translate-x-0',
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          'fixed inset-y-0 right-0 z-50 w-64 transform bg-white shadow-lg transition-transform duration-200 lg:relative lg:translate-x-0',
+          sidebarOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
         <div className="flex h-16 items-center justify-between border-b border-border px-6">
-          <h1 className="text-xl font-bold text-primary">QSM</h1>
+          <h1 className="text-xl font-bold text-primary">نور القرآن</h1>
           <button
             onClick={() => setSidebarOpen(false)}
             className="rounded-lg p-1 text-text-muted hover:bg-gray-100 lg:hidden"
@@ -94,7 +94,7 @@ export default function AppLayout() {
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-text-muted transition-colors hover:bg-danger/10 hover:text-danger"
           >
             <LogOut className="h-5 w-5" />
-            Logout
+            تسجيل الخروج
           </button>
         </div>
       </aside>

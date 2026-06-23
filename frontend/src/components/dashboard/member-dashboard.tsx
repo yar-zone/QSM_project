@@ -12,22 +12,22 @@ interface UpcomingModule {
 
 const MODULES: Record<Role, UpcomingModule[]> = {
   teacher: [
-    { icon: BookOpen, title: "Memorization", desc: "Record Juz/Hizb progress and scores." },
-    { icon: CalendarCheck, title: "Attendance", desc: "Track present, absent and excused." },
-    { icon: Video, title: "Meetings", desc: "Schedule and launch Jitsi sessions." },
-    { icon: BarChart3, title: "Statistics", desc: "Follow your students' progress." },
+    { icon: BookOpen, title: "الحفظ", desc: "سجل تقدم الأجزاء والأحزاب والدرجات." },
+    { icon: CalendarCheck, title: "الحضور", desc: "تتبع الحضور والغياب والأعذار." },
+    { icon: Video, title: "الاجتماعات", desc: "جدولة وإطلاق جلسات الاجتماعات." },
+    { icon: BarChart3, title: "الإحصائيات", desc: "تابع تقدم طلابك." },
   ],
   student: [
-    { icon: BookOpen, title: "My progress", desc: "Memorized surahs and hizbs." },
-    { icon: Award, title: "Certificates", desc: "View and download your certificates." },
-    { icon: CalendarCheck, title: "Attendance", desc: "Your attendance history." },
-    { icon: Bell, title: "Announcements", desc: "Stay up to date." },
+    { icon: BookOpen, title: "تقدّمي", desc: "السور والأحزاب المحفوظة." },
+    { icon: Award, title: "الشهادات", desc: "عرض وتنزيل شهاداتك." },
+    { icon: CalendarCheck, title: "الحضور", desc: "سجل حضورك." },
+    { icon: Bell, title: "الإعلانات", desc: "ابق على اطلاع." },
   ],
   parent: [
-    { icon: BookOpen, title: "Child's progress", desc: "Track memorization and scores." },
-    { icon: Award, title: "Certificates", desc: "View your child's certificates." },
-    { icon: CalendarCheck, title: "Attendance", desc: "Your child's attendance history." },
-    { icon: Bell, title: "Announcements", desc: "Stay up to date." },
+    { icon: BookOpen, title: "تقدّم الطفل", desc: "تتبع الحفظ والدرجات." },
+    { icon: Award, title: "الشهادات", desc: "عرض شهادات طفلك." },
+    { icon: CalendarCheck, title: "الحضور", desc: "سجل حضور طفلك." },
+    { icon: Bell, title: "الإعلانات", desc: "ابق على اطلاع." },
   ],
   admin: [],
   organizer: [],
@@ -37,12 +37,12 @@ const DELAYS = ["stagger-1", "stagger-2", "stagger-3", "stagger-4"]
 
 export function MemberDashboard({ role }: { role: "teacher" | "student" | "parent" }) {
   const { user } = useAuth()
-  const titleMap = { teacher: "Teacher Dashboard", student: "Student Dashboard", parent: "Parent Dashboard" } as const
+  const titleMap = { teacher: "لوحة تحكم المعلم", student: "لوحة تحكم الطالب", parent: "لوحة تحكم ولي الأمر" } as const
   const firstName = (user?.name || "").split(" ")[0]
 
   return (
     <div className="fade-in-up">
-      <PageHeader title={titleMap[role]} description={firstName ? `Welcome back, ${firstName}.` : "Welcome back."} />
+      <PageHeader title={titleMap[role]} description={firstName ? `مرحباً بعودتك، ${firstName}.` : "مرحباً بعودتك."} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {MODULES[role].map((m, i) => (
           <Card key={m.title} className={`card-hover shadow-[var(--shadow-card)] fade-in-up ${DELAYS[i]}`}>

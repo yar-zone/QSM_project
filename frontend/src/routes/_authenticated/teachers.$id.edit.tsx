@@ -19,8 +19,8 @@ export const Route = createFileRoute("/_authenticated/teachers/$id/edit")({
 })
 
 const schema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120),
-  email: z.string().trim().min(1, "Email is required").email("Invalid email"),
+  name: z.string().trim().min(1, "الاسم مطلوب").max(120),
+  email: z.string().trim().min(1, "البريد الإلكتروني مطلوب").email("بريد إلكتروني غير صالح"),
   phone: z.string().trim().max(30).optional().or(z.literal("")),
   qualification: z.string().trim().optional().or(z.literal("")),
   specialization: z.string().trim().optional().or(z.literal("")),
@@ -64,10 +64,10 @@ function EditTeacherPage() {
         specialization: values.specialization || undefined,
         is_active: values.is_active,
       })
-      toast.success("Teacher updated")
+      toast.success("تم تحديث المعلم")
       navigate({ to: "/teachers" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update teacher")
+      toast.error(err?.response?.data?.message || "فشل تحديث المعلم")
     } finally {
       setSaving(false)
     }
@@ -83,40 +83,40 @@ function EditTeacherPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="Edit Teacher" description={`Editing ${teacher?.user?.name ?? "teacher"}.`}>
+      <PageHeader title="تعديل المعلم" description={`تعديل ${teacher?.user?.name ?? "teacher"}.`}>
         <Button variant="outline" asChild>
           <a href="/teachers">
             <ArrowLeft className="h-4 w-4" />
-            Back
+            رجوع
           </a>
         </Button>
       </PageHeader>
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
-          <CardTitle>Teacher Details</CardTitle>
+          <CardTitle>بيانات المعلم</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">الاسم الكامل</Label>
               <Input id="name" {...register("name")} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">البريد الإلكتروني</Label>
               <Input id="email" type="email" {...register("email")} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">الهاتف</Label>
               <Input id="phone" type="tel" {...register("phone")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="qualification">Qualification</Label>
+              <Label htmlFor="qualification">المؤهل</Label>
               <Input id="qualification" {...register("qualification")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="specialization">Specialization</Label>
+              <Label htmlFor="specialization">التخصص</Label>
               <Input id="specialization" {...register("specialization")} />
             </div>
             <div className="flex items-center gap-2">
@@ -127,11 +127,11 @@ function EditTeacherPage() {
                 onChange={(e) => setValue("is_active", e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
-              <Label htmlFor="is_active">Active</Label>
+              <Label htmlFor="is_active">نشط</Label>
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              حفظ التغييرات
             </Button>
           </form>
         </CardContent>

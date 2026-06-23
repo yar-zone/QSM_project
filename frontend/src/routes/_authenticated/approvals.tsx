@@ -35,24 +35,24 @@ function ApprovalsPage() {
 
   const approveMutation = useMutation({
     mutationFn: async (id: number) => { await userApi.approve(id); return id },
-    onSuccess: () => { toast.success("User approved"); queryClient.invalidateQueries({ queryKey: ["users-pending"] }) },
-    onError: () => toast.error("Failed to approve user"),
+    onSuccess: () => { toast.success("تم اعتماد المستخدم"); queryClient.invalidateQueries({ queryKey: ["users-pending"] }) },
+    onError: () => toast.error("فشل اعتماد المستخدم"),
   })
 
   const rejectMutation = useMutation({
     mutationFn: async (id: number) => { await userApi.reject(id); return id },
-    onSuccess: (id) => { toast.success("User rejected"); queryClient.invalidateQueries({ queryKey: ["users-pending"] }) },
-    onError: () => toast.error("Failed to reject user"),
+    onSuccess: (id) => { toast.success("تم رفض المستخدم"); queryClient.invalidateQueries({ queryKey: ["users-pending"] }) },
+    onError: () => toast.error("فشل رفض المستخدم"),
   })
 
   return (
     <div>
-      <PageHeader title="User Approvals" description="Review and approve new accounts before they gain access." />
+      <PageHeader title="موافقات المستخدمين" description="مراجعة واعتماد الحسابات الجديدة قبل منحهم الوصول." />
 
       <Tabs value={filter} onValueChange={(v) => setFilter(v as "pending" | "all")}>
         <TabsList>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
-          <TabsTrigger value="all">All</TabsTrigger>
+          <TabsTrigger value="pending">قيد الانتظار</TabsTrigger>
+          <TabsTrigger value="all">الكل</TabsTrigger>
         </TabsList>
       </Tabs>
 
@@ -65,7 +65,7 @@ function ApprovalsPage() {
           <Card>
             <CardContent className="grid place-items-center gap-2 py-16 text-center text-muted-foreground">
               <Inbox className="h-8 w-8" />
-              <p>No users in this list.</p>
+              <p>لا يوجد مستخدمين في هذه القائمة.</p>
             </CardContent>
           </Card>
         ) : (
@@ -112,12 +112,12 @@ function UserRow({ user, approving, rejecting, onApprove, onReject }: {
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" disabled={rejecting || user.status !== "pending"} onClick={onReject}>
-            {rejecting ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <X className="mr-1 h-4 w-4" />}
-            Reject
+            {rejecting ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : <X className="ml-1 h-4 w-4" />}
+            رفض
           </Button>
           <Button size="sm" disabled={approving || user.status !== "pending"} onClick={onApprove}>
-            {approving ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Check className="mr-1 h-4 w-4" />}
-            Approve
+            {approving ? <Loader2 className="ml-1 h-4 w-4 animate-spin" /> : <Check className="ml-1 h-4 w-4" />}
+            اعتماد
           </Button>
         </div>
       </CardContent>

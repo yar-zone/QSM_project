@@ -17,10 +17,10 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const AUDIENCE_ROLES = [
-  { value: "organizer", label: "Organizers" },
-  { value: "teacher", label: "Teachers" },
-  { value: "student", label: "Students" },
-  { value: "parent", label: "Parents" },
+  { value: "organizer", label: "المنظمون" },
+  { value: "teacher", label: "المعلمون" },
+  { value: "student", label: "الطلاب" },
+  { value: "parent", label: "أولياء الأمور" },
 ] as const
 
 const schema = z.object({
@@ -58,7 +58,7 @@ function NewAnnouncementPage() {
 
   const onSubmit = async (values: Values) => {
     if (selectedAudience.length === 0) {
-      setAudienceError("Select at least one audience")
+      setAudienceError("اختر جمهوراً واحداً على الأقل")
       return
     }
     setSaving(true)
@@ -67,10 +67,10 @@ function NewAnnouncementPage() {
         ...values,
         target_audience: selectedAudience.join(","),
       })
-      toast.success("Announcement created")
+      toast.success("تم إنشاء الإعلان")
       navigate({ to: "/announcements" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to create announcement")
+      toast.error(err?.response?.data?.message || "فشل إنشاء الإعلان")
     } finally {
       setSaving(false)
     }
@@ -78,37 +78,37 @@ function NewAnnouncementPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="New Announcement" description="Create a new announcement." />
+      <PageHeader title="إعلان جديد" description="إنشاء إعلان جديد." />
       <Card className="shadow-[var(--shadow-card)]">
-        <CardHeader><CardTitle>Announcement Details</CardTitle></CardHeader>
+        <CardHeader><CardTitle>تفاصيل الإعلان</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">العنوان</Label>
               <Input id="title" {...register("title")} />
               {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="content">Content</Label>
+              <Label htmlFor="content">المحتوى</Label>
               <Textarea id="content" rows={5} {...register("content")} />
               {errors.content && <p className="text-xs text-destructive">{errors.content.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="category">Category</Label>
+              <Label htmlFor="category">التصنيف</Label>
               <Select onValueChange={(v) => setValue("category", v)} defaultValue="general">
-                <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="اختر تصنيفاً" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="general">General</SelectItem>
-                  <SelectItem value="exams">Exams</SelectItem>
-                  <SelectItem value="events">Events</SelectItem>
-                  <SelectItem value="meetings">Meetings</SelectItem>
-                  <SelectItem value="urgent">Urgent</SelectItem>
+                  <SelectItem value="general">عام</SelectItem>
+                  <SelectItem value="exams">امتحانات</SelectItem>
+                  <SelectItem value="events">فعاليات</SelectItem>
+                  <SelectItem value="meetings">اجتماعات</SelectItem>
+                  <SelectItem value="urgent">عاجل</SelectItem>
                 </SelectContent>
               </Select>
               {errors.category && <p className="text-xs text-destructive">{errors.category.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label>Target Audience</Label>
+              <Label>الجمهور المستهدف</Label>
               <div className="grid grid-cols-2 gap-2">
                 {AUDIENCE_ROLES.map((role) => {
                   const checked = selectedAudience.includes(role.value)
@@ -135,22 +135,22 @@ function NewAnnouncementPage() {
             <div className="space-y-1.5">
               <Label className="flex items-center gap-2">
                 <Video className="h-4 w-4 text-primary" />
-                Meeting Link (optional)
+                رابط الاجتماع (اختياري)
               </Label>
               <Input id="meeting_link" {...register("meeting_link")} placeholder="https://meet.jit.si/..." />
             </div>
             <div className="flex items-center gap-2">
               <Checkbox id="is_pinned" checked={watch("is_pinned")} onCheckedChange={(v) => setValue("is_pinned", v === true)} />
-              <Label htmlFor="is_pinned">Pin this announcement</Label>
+              <Label htmlFor="is_pinned">تثبيت هذا الإعلان</Label>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="published_at">Publish Date</Label>
+              <Label htmlFor="published_at">تاريخ النشر</Label>
               <Input id="published_at" type="date" {...register("published_at")} />
               {errors.published_at && <p className="text-xs text-destructive">{errors.published_at.message}</p>}
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Announcement
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              إنشاء إعلان
             </Button>
           </form>
         </CardContent>

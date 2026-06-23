@@ -77,10 +77,10 @@ function EditParentPage() {
         student_ids: selectedStudents,
       })
       queryClient.invalidateQueries({ queryKey: ["parents"] })
-      toast.success("Parent updated")
+      toast.success("تم تحديث ولي الأمر")
       navigate({ to: "/parents" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update parent")
+      toast.error(err?.response?.data?.message || "فشل تحديث ولي الأمر")
     } finally {
       setSaving(false)
     }
@@ -98,36 +98,36 @@ function EditParentPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="Edit Parent" description={`Editing ${parent?.name ?? "parent"}.`}>
+      <PageHeader title="تعديل ولي الأمر" description={`تعديل ${parent?.name ?? "ولي الأمر"}.`}>
         <a href="/parents">
           <Button variant="outline">
             <ArrowLeft className="h-4 w-4" />
-            Back
+            رجوع
           </Button>
         </a>
       </PageHeader>
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
-          <CardTitle>Parent Details</CardTitle>
+          <CardTitle>بيانات ولي الأمر</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">الاسم الكامل</Label>
               <Input id="name" {...register("name")} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">البريد الإلكتروني</Label>
               <Input id="email" type="email" {...register("email")} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">الهاتف</Label>
               <Input id="phone" type="tel" {...register("phone")} />
             </div>
             <div className="space-y-1.5">
-              <Label>Linked Students</Label>
+              <Label>الطلاب المرتبطون</Label>
               {students && students.length > 0 ? (
                 <div className="max-h-48 overflow-y-auto rounded-md border p-2 space-y-1">
                   {students.map((s) => {
@@ -146,12 +146,12 @@ function EditParentPage() {
                   })}
                 </div>
               ) : (
-                <p className="text-sm text-muted-foreground">No students available.</p>
+                <p className="text-sm text-muted-foreground">لا يوجد طلاب متاحون.</p>
               )}
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              حفظ التغييرات
             </Button>
           </form>
         </CardContent>

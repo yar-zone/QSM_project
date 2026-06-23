@@ -15,17 +15,17 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nur Quranic School — Memorization, Exams & Certificates" },
+      { title: "نور القرآن — الحفظ والامتحانات والشهادات" },
       {
         name: "description",
         content:
-          "A complete Quranic school management platform: track Juz/Hizb memorization, schedule exams, issue certificates, manage attendance, meetings and announcements.",
+          "منصة متكاملة لإدارة المدارس القرآنية: تتبع حفظ الأجزاء والأحزاب، جدولة الامتحانات، إصدار الشهادات، إدارة الحضور والاجتماعات والإعلانات.",
       },
-      { property: "og:title", content: "Nur Quranic School Management Platform" },
+      { property: "og:title", content: "منصة إدارة مدارس نور القرآن" },
       {
         property: "og:description",
         content:
-          "Track memorization, schedule exams, issue certificates and follow school analytics.",
+          "تتبع الحفظ، جدولة الامتحانات، إصدار الشهادات ومتابعة تحليلات المدرسة.",
       },
     ],
   }),
@@ -33,14 +33,14 @@ export const Route = createFileRoute("/")({
 });
 
 const FEATURES = [
-  { icon: BookOpen, title: "Memorization Tracking", desc: "Follow Juz, Hizb and Surah progress with revision levels and scores." },
-  { icon: GraduationCap, title: "Examinations", desc: "Book and manage 15, 30, 45 and 60 Hizb exams with committees and results." },
-  { icon: Award, title: "Certificates", desc: "Auto-generate beautiful PDF certificates with QR verification." },
-  { icon: CalendarCheck, title: "Attendance", desc: "Record presence, absences and excuses with rich analytics." },
-  { icon: Video, title: "Online Meetings", desc: "Schedule and launch Jitsi meetings with students and parents." },
-  { icon: BarChart3, title: "School Analytics", desc: "Line, bar and pie charts across students, classes and teachers." },
-  { icon: Bell, title: "Announcements", desc: "General, exams, events, meetings and urgent notices." },
-  { icon: ShieldCheck, title: "Role-based Access", desc: "Admin, Organizer, Teacher, Student and Parent — each with the right access." },
+  { icon: BookOpen, title: "تتبع الحفظ", desc: "تابع تقدّم الأجزاء والأحزاب والسور مع مستويات المراجعة والدرجات." },
+  { icon: GraduationCap, title: "الامتحانات", desc: "احجز وأدر امتحانات 15 و30 و45 و60 حزباً مع اللجان والنتائج." },
+  { icon: Award, title: "الشهادات", desc: "إنشاء شهادات PDF جميلة تلقائياً مع التحقق عبر QR." },
+  { icon: CalendarCheck, title: "الحضور", desc: "سجل الحضور والغياب والأعذار مع تحليلات غنية." },
+  { icon: Video, title: "الاجتماعات عبر الإنترنت", desc: "جدولة وإطلاق اجتماعات مع الطلاب وأولياء الأمور." },
+  { icon: BarChart3, title: "تحليلات المدرسة", desc: "رسوم بيانية خطية وشريطية ودائرية للطلاب والفصول والمعلمين." },
+  { icon: Bell, title: "الإعلانات", desc: "إعلانات عامة، امتحانات، فعاليات، اجتماعات وإشعارات عاجلة." },
+  { icon: ShieldCheck, title: "الوصول حسب الأدوار", desc: "مدير، منظم، معلم، طالب وولي أمر — كلٌ بحسب صلاحياته." },
 ];
 
 function Landing() {
@@ -52,14 +52,14 @@ function Landing() {
             <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground">
               <BookOpen className="h-5 w-5" />
             </span>
-            <span className="font-display text-xl font-bold text-primary">Nur Quran</span>
+            <span className="font-display text-xl font-bold text-primary">نور القرآن</span>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/auth" search={{ mode: "login" }}>
-              <Button variant="ghost">Sign in</Button>
+              <Button variant="ghost">تسجيل الدخول</Button>
             </Link>
             <Link to="/auth" search={{ mode: "register" }}>
-              <Button>Get started</Button>
+              <Button>ابدأ الآن</Button>
             </Link>
           </div>
         </div>
@@ -69,25 +69,24 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-4 py-20 text-center">
           <p className="font-display text-2xl text-secondary">بسم الله الرحمن الرحيم</p>
           <h1 className="mx-auto mt-4 max-w-3xl text-4xl font-bold leading-tight text-foreground md:text-5xl">
-            A complete platform to manage your Quranic school
+            منصة متكاملة لإدارة مدرستك القرآنية
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-lg text-muted-foreground">
-            Track memorization, run examinations, issue certificates, follow attendance and host
-            meetings — all in one beautiful, secure place.
+            تتبع الحفظ، إجراء الامتحانات، إصدار الشهادات، متابعة الحضور واستضافة الاجتماعات — كل ذلك في مكان واحد آمن وجميل.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link to="/auth" search={{ mode: "register" }}>
-              <Button size="lg">Create your account</Button>
+              <Button size="lg">إنشاء حسابك</Button>
             </Link>
             <Link to="/auth" search={{ mode: "login" }}>
-              <Button size="lg" variant="outline">I already have an account</Button>
+              <Button size="lg" variant="outline">لدي حساب بالفعل</Button>
             </Link>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-center text-3xl font-bold text-foreground">Everything in one place</h2>
+        <h2 className="text-center text-3xl font-bold text-foreground">كل شيء في مكان واحد</h2>
         <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((f) => (
             <div
@@ -106,7 +105,7 @@ function Landing() {
 
       <footer className="border-t border-border/60 py-8">
         <p className="text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} Nur Quranic School. All rights reserved.
+          © {new Date().getFullYear()} مدرسة نور القرآن. جميع الحقوق محفوظة.
         </p>
       </footer>
     </div>

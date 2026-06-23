@@ -256,6 +256,57 @@ class AttendanceController extends Controller
         ]);
     }
 
+    public function classReports(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $classIds = null;
+        if ($user->role === 'teacher') {
+            $teacher = $user->teacher;
+            $classIds = $teacher ? $teacher->classes()->pluck('classes.id')->toArray() : [];
+        }
+
+        $attendances = Attendance::selectRaw("class_id, status, COUNT(*) as count")
+            ->when($classIds !== null, fn($q) => $q->whereIn('class_id', $classIds))
+            ->when($request->has('date_from'), fn($q) => $q->where('date', '>=', $request->date_from))
+            ->when($request->has('date_to'), fn($q) => $q->where('date', '<=', $request->date_to))
+            ->groupBy('class_id', 'status')
+            ->get();
+
+        $grouped = $attendances->groupBy('class_id');
+
+        $classes = \App\Models\Classe::whereIn('id', $grouped->keys())
+            ->get()
+            ->keyBy('id');
+
+        $result = [];
+        foreach ($grouped as $classId => $records) {
+            $present = $records->where('status', 'present')->sum('count');
+            $absent = $records->where('status', 'absent')->sum('count');
+            $late = $records->where('status', 'late')->sum('count');
+            $excused = $records->where('status', 'excused')->sum('count');
+            $total = $present + $absent + $late + $excused;
+
+            $result[] = [
+                'class_id' => (int) $classId,
+                'class_name' => $classes[$classId]->name ?? "فصل #$classId",
+                'present' => $present,
+                'absent' => $absent,
+                'late' => $late,
+                'excused' => $excused,
+                'total' => $total,
+                'attendance_percentage' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+            ];
+        }
+
+        usort($result, fn($a, $b) => strcmp($a['class_name'], $b['class_name']));
+
+        return response()->json([
+            'success' => true,
+            'data' => $result,
+        ]);
+    }
+
     public function myAttendance(Request $request): JsonResponse
     {
         $user = $request->user();

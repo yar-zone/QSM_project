@@ -53,25 +53,25 @@ function MeetingsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => meetingApi.delete(id),
-    onSuccess: () => { toast.success("Meeting deleted"); queryClient.invalidateQueries({ queryKey: ["meetings"] }) },
-    onError: () => toast.error("Failed to delete meeting"),
+    onSuccess: () => { toast.success("تم حذف الاجتماع"); queryClient.invalidateQueries({ queryKey: ["meetings"] }) },
+    onError: () => toast.error("فشل حذف الاجتماع"),
   })
 
   if (isChildRoute) return <Outlet />
 
   return (
     <div>
-      <PageHeader title="Meetings" description="View and manage scheduled meetings.">
+      <PageHeader title="الاجتماعات" description="عرض وإدارة الاجتماعات المجدولة.">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search meetings..."
+            placeholder="بحث عن اجتماع..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-64 pl-9"
+            className="w-64 pr-9"
           />
         </div>
-        {(isAdmin || isOrganizer || isTeacher) && <a href="/meetings/new"><Button><Plus className="mr-1 h-4 w-4" />New Meeting</Button></a>}
+        {(isAdmin || isOrganizer || isTeacher) && <a href="/meetings/new"><Button><Plus className="ml-1 h-4 w-4" />اجتماع جديد</Button></a>}
       </PageHeader>
 
       {isLoading ? (
@@ -82,7 +82,7 @@ function MeetingsPage() {
         <Card>
           <CardContent className="grid place-items-center gap-2 py-16 text-center text-muted-foreground">
             <Inbox className="h-8 w-8" />
-            <p>{search ? "No meetings match your search." : "No meetings found."}</p>
+            <p>{search ? "لا توجد اجتماعات تطابق بحثك." : "لم يتم العثور على اجتماعات."}</p>
           </CardContent>
         </Card>
       ) : (
@@ -90,12 +90,12 @@ function MeetingsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Platform</TableHead>
-                <TableHead>Scheduled At</TableHead>
-                <TableHead>Duration (min)</TableHead>
-                <TableHead>Status</TableHead>
-                {(isAdmin || isOrganizer || isTeacher) && <TableHead className="text-right">Actions</TableHead>}
+                <TableHead>العنوان</TableHead>
+                <TableHead>المنصة</TableHead>
+                <TableHead>المجدول في</TableHead>
+                <TableHead>المدة (دقيقة)</TableHead>
+                <TableHead>الحالة</TableHead>
+                {(isAdmin || isOrganizer || isTeacher) && <TableHead className="text-left">الإجراءات</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -107,7 +107,7 @@ function MeetingsPage() {
                   <TableCell>{m.duration_minutes}</TableCell>
                   <TableCell>{statusBadge(m.status)}</TableCell>
                   {(isAdmin || isOrganizer || isTeacher) && (
-                    <TableCell className="text-right">
+                    <TableCell className="text-left">
                       <Button size="sm" variant="ghost" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate(m.id)}>
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>

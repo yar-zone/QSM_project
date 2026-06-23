@@ -53,10 +53,10 @@ function NewLevelPage() {
         order: values.order,
         is_active: values.is_active,
       })
-      toast.success("Level created")
+      toast.success("تم إنشاء المستوى")
       navigate({ to: "/levels" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to create level")
+      toast.error(err?.response?.data?.message || "فشل إنشاء المستوى")
     } finally {
       setSaving(false)
     }
@@ -64,32 +64,32 @@ function NewLevelPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="New Level" description="Create a new academic level.">
+      <PageHeader title="مستوى جديد" description="إنشاء مستوى دراسي جديد.">
         <Button variant="outline" asChild>
           <a href="/levels">
             <ArrowLeft className="h-4 w-4" />
-            Back
+            رجوع
           </a>
         </Button>
       </PageHeader>
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
-          <CardTitle>Level Details</CardTitle>
+          <CardTitle>بيانات المستوى</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">الاسم</Label>
               <Input id="name" {...register("name")} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">الوصف</Label>
               <Textarea id="description" {...register("description")} />
               {errors.description && <p className="text-xs text-destructive">{errors.description.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="order">Order</Label>
+              <Label htmlFor="order">الترتيب</Label>
               <Input id="order" type="number" {...register("order")} />
               {errors.order && <p className="text-xs text-destructive">{errors.order.message}</p>}
             </div>
@@ -99,11 +99,11 @@ function NewLevelPage() {
                 checked={isActive}
                 onCheckedChange={(v) => setValue("is_active", v === true)}
               />
-              <Label htmlFor="is_active" className="cursor-pointer">Active</Label>
+              <Label htmlFor="is_active" className="cursor-pointer">نشط</Label>
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Create Level
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              إنشاء مستوى
             </Button>
           </form>
         </CardContent>

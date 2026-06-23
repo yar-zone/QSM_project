@@ -20,10 +20,10 @@ export const Route = createFileRoute("/_authenticated/attendance/new")({
 type Status = "present" | "absent" | "excused" | "late"
 
 const STATUS_OPTIONS: { value: Status; label: string; icon: React.ReactNode }[] = [
-  { value: "present", label: "Present", icon: <CheckCircle className="h-4 w-4 text-green-600" /> },
-  { value: "absent", label: "Absent", icon: <XCircle className="h-4 w-4 text-red-600" /> },
-  { value: "excused", label: "Excused", icon: <AlertTriangle className="h-4 w-4 text-blue-600" /> },
-  { value: "late", label: "Late", icon: <Clock className="h-4 w-4 text-amber-600" /> },
+  { value: "present", label: "حاضر", icon: <CheckCircle className="h-4 w-4 text-green-600" /> },
+  { value: "absent", label: "غائب", icon: <XCircle className="h-4 w-4 text-red-600" /> },
+  { value: "excused", label: "معذور", icon: <AlertTriangle className="h-4 w-4 text-blue-600" /> },
+  { value: "late", label: "متأخر", icon: <Clock className="h-4 w-4 text-amber-600" /> },
 ]
 
 function NewAttendancePage() {
@@ -58,8 +58,8 @@ function NewAttendancePage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!classId || !date) { toast.error("Select a class and date"); return }
-    if (!students || students.length === 0) { toast.error("No students in this class"); return }
+    if (!classId || !date) { toast.error("اختر فصلاً وتاريخاً"); return }
+    if (!students || students.length === 0) { toast.error("لا يوجد طلاب في هذا الفصل"); return }
 
     const attendances = students.map((s: Student) => ({
       student_id: s.id,
@@ -70,10 +70,10 @@ function NewAttendancePage() {
     try {
       await attendanceApi.bulk({ class_id: Number(classId), date, attendances })
       queryClient.invalidateQueries({ queryKey: ["attendance"] })
-      toast.success("Attendance saved")
+      toast.success("تم حفظ الحضور")
       navigate({ to: "/attendance" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to save attendance")
+      toast.error(err?.response?.data?.message || "فشل حفظ الحضور")
     } finally {
       setSaving(false)
     }
@@ -81,16 +81,16 @@ function NewAttendancePage() {
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title="Mark Attendance" description="Record attendance for a whole class." />
+      <PageHeader title="تسجيل الحضور" description="تسجيل الحضور لفصل كامل." />
       <Card className="shadow-[var(--shadow-card)]">
-        <CardHeader><CardTitle>Attendance Form</CardTitle></CardHeader>
+        <CardHeader><CardTitle>نموذج الحضور</CardTitle></CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="class">Class</Label>
+                <Label htmlFor="class">الفصل</Label>
                 <Select value={classId} onValueChange={(v) => { setClassId(v); setStatuses({}) }}>
-                  <SelectTrigger><SelectValue placeholder="Select a class" /></SelectTrigger>
+                  <SelectTrigger><SelectValue placeholder="اختر فصلاً" /></SelectTrigger>
                   <SelectContent>
                     {classes?.map((c) => (
                       <SelectItem key={c.id} value={String(c.id)}>{c.name}</SelectItem>
@@ -99,7 +99,7 @@ function NewAttendancePage() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="date">Date</Label>
+                <Label htmlFor="date">التاريخ</Label>
                 <Input id="date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
               </div>
             </div>
@@ -107,7 +107,7 @@ function NewAttendancePage() {
             {classId && (
               <>
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="font-medium">Quick mark all as:</span>
+                  <span className="font-medium">تحديد الكل كـ:</span>
                   {STATUS_OPTIONS.map((opt) => (
                     <Button key={opt.value} type="button" variant="outline" size="sm" onClick={() => markAllAs(opt.value)}>
                       {opt.icon}{opt.label}
@@ -120,17 +120,17 @@ function NewAttendancePage() {
                     <Loader2 className="h-6 w-6 animate-spin" />
                   </div>
                 ) : !students || students.length === 0 ? (
-                  <p className="text-sm text-muted-foreground py-8 text-center">No students enrolled in this class.</p>
+                  <p className="text-sm text-muted-foreground py-8 text-center">لا يوجد طلاب مسجلون في هذا الفصل.</p>
                 ) : (
                   <div className="max-h-96 overflow-y-auto rounded-md border">
                     <table className="w-full text-sm">
                       <thead className="bg-muted/50 sticky top-0">
                         <tr>
-                          <th className="text-left px-3 py-2 font-medium">Student</th>
-                          <th className="text-center px-3 py-2 font-medium">Present</th>
-                          <th className="text-center px-3 py-2 font-medium">Absent</th>
-                          <th className="text-center px-3 py-2 font-medium">Excused</th>
-                          <th className="text-center px-3 py-2 font-medium">Late</th>
+                          <th className="text-left px-3 py-2 font-medium">الطالب</th>
+                          <th className="text-center px-3 py-2 font-medium">حاضر</th>
+                          <th className="text-center px-3 py-2 font-medium">غائب</th>
+                          <th className="text-center px-3 py-2 font-medium">معذور</th>
+                          <th className="text-center px-3 py-2 font-medium">متأخر</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -160,8 +160,8 @@ function NewAttendancePage() {
                 )}
 
                 <Button type="submit" disabled={saving || !students || students.length === 0}>
-                  {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Attendance
+                  {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                  حفظ الحضور
                 </Button>
               </>
             )}

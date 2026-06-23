@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
-import { useQuery } from "@tanstack/react-query"
-import { Loader2, Inbox, Plus, Pin, PinOff, Search, Video, ExternalLink } from "lucide-react"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { Loader2, Inbox, Plus, Pencil, Trash2, Pin, PinOff, Search, Video, ExternalLink } from "lucide-react"
+import { toast } from "sonner"
 import { useState, useMemo } from "react"
 
 import { useAuth } from "@/hooks/use-auth"
@@ -12,6 +13,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/announcements")({
   component: AnnouncementsPage,
@@ -53,14 +58,36 @@ function categoryBadge(category: string) {
 
 function AnnouncementsPage() {
   const { isAdmin, isOrganizer, isTeacher } = useAuth()
+  const canManage = isAdmin || isOrganizer || isTeacher
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isChildRoute = pathname !== "/announcements"
+  const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
+  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [editForm, setEditForm] = useState({ title: "", content: "", category: "", is_pinned: false })
 
   const { data: announcements, isLoading } = useQuery({
     queryKey: ["announcements"],
     queryFn: () => announcementApi.list(),
   })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => announcementApi.delete(id),
+    onSuccess: () => { toast.success("تم حذف الإعلان"); queryClient.invalidateQueries({ queryKey: ["announcements"] }); setDeleteId(null) },
+    onError: () => toast.error("فشل حذف الإعلان"),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<Announcement> }) => announcementApi.update(id, data),
+    onSuccess: () => { toast.success("تم تحديث الإعلان"); queryClient.invalidateQueries({ queryKey: ["announcements"] }); setEditId(null) },
+    onError: () => toast.error("فشل تحديث الإعلان"),
+  })
+
+  function openEdit(a: Announcement) {
+    setEditForm({ title: a.title, content: a.content, category: a.category, is_pinned: a.is_pinned })
+    setEditId(a.id)
+  }
 
   if (isChildRoute) return <Outlet />
 
@@ -82,17 +109,17 @@ function AnnouncementsPage() {
 
   return (
     <div>
-      <PageHeader title="Announcements" description="View all announcements and notices.">
+      <PageHeader title="الإعلانات" description="عرض جميع الإعلانات والتنبيهات.">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search announcements..."
+            placeholder="بحث عن إعلان..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-64 pl-9"
+            className="w-64 pr-9"
           />
         </div>
-        {(isAdmin || isOrganizer || isTeacher) && <a href="/announcements/new"><Button><Plus className="mr-1 h-4 w-4" />New Announcement</Button></a>}
+        {(isAdmin || isOrganizer || isTeacher) && <a href="/announcements/new"><Button><Plus className="ml-1 h-4 w-4" />إعلان جديد</Button></a>}
       </PageHeader>
 
       {isLoading ? (
@@ -103,7 +130,7 @@ function AnnouncementsPage() {
         <Card>
           <CardContent className="grid place-items-center gap-2 py-16 text-center text-muted-foreground">
             <Inbox className="h-8 w-8" />
-            <p>No announcements found.</p>
+            <p>لم يتم العثور على إعلانات.</p>
           </CardContent>
         </Card>
       ) : (
@@ -131,8 +158,8 @@ function AnnouncementsPage() {
                         <Video className="h-5 w-5" />
                       </span>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold text-foreground">Meeting Details</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">Click the link below to join the meeting</p>
+                        <p className="text-sm font-semibold text-foreground">تفاصيل الاجتماع</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">انقر على الرابط أدناه للانضمام إلى الاجتماع</p>
                         <a
                           href={a.meeting_link}
                           target="_blank"
@@ -140,14 +167,14 @@ function AnnouncementsPage() {
                           className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
                         >
                           <ExternalLink className="h-3.5 w-3.5" />
-                          Join Meeting
+                          انضمام إلى الاجتماع
                         </a>
                       </div>
                     </div>
                   </div>
                 )}
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span>{a.author?.name ?? "Unknown"}</span>
+                  <span>{a.author?.name ?? "غير معروف"}</span>
                   <span>·</span>
                   <span>{new Date(a.published_at).toLocaleDateString()}</span>
                   {a.target_audience && (
@@ -157,6 +184,75 @@ function AnnouncementsPage() {
                     </>
                   )}
                 </div>
+                {canManage && (
+                  <div className="flex items-center gap-1 pt-2 border-t mt-3">
+                    <Dialog open={editId === a.id} onOpenChange={(open) => { if (!open) setEditId(null); }}>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" onClick={() => openEdit(a)}>
+                          <Pencil className="h-3.5 w-3.5 ml-1" />تعديل
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader><DialogTitle>تعديل الإعلان</DialogTitle></DialogHeader>
+                        <div className="space-y-4 py-2">
+                          <div className="space-y-1.5">
+                            <Label>العنوان</Label>
+                            <Input value={editForm.title} onChange={(e) => setEditForm(f => ({ ...f, title: e.target.value }))} />
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label>المحتوى</Label>
+                            <Textarea rows={4} value={editForm.content} onChange={(e) => setEditForm(f => ({ ...f, content: e.target.value }))} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1.5">
+                              <Label>التصنيف</Label>
+                              <Select value={editForm.category} onValueChange={(v) => setEditForm(f => ({ ...f, category: v }))}>
+                                <SelectTrigger><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="general">عام</SelectItem>
+                                  <SelectItem value="exams">امتحانات</SelectItem>
+                                  <SelectItem value="events">أحداث</SelectItem>
+                                  <SelectItem value="meetings">اجتماعات</SelectItem>
+                                  <SelectItem value="urgent">عاجل</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="flex items-center gap-2 pt-6">
+                              <input type="checkbox" id="edit_is_pinned" checked={editForm.is_pinned} onChange={(e) => setEditForm(f => ({ ...f, is_pinned: e.target.checked }))} className="h-4 w-4" />
+                              <Label htmlFor="edit_is_pinned">مثبت</Label>
+                            </div>
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
+                          <Button onClick={() => updateMutation.mutate({ id: a.id, data: { title: editForm.title, content: editForm.content, category: editForm.category, is_pinned: editForm.is_pinned } })} disabled={updateMutation.isPending}>
+                            {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                            حفظ
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                    <Dialog open={deleteId === a.id} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" size="sm" onClick={() => setDeleteId(a.id)}>
+                          <Trash2 className="h-3.5 w-3.5 ml-1 text-red-500" />حذف
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader><DialogTitle>تأكيد الحذف</DialogTitle>
+                          <DialogDescription>هل أنت متأكد من حذف الإعلان "{a.title}"؟ لا يمكن التراجع عن هذا الإجراء.</DialogDescription>
+                        </DialogHeader>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setDeleteId(null)}>إلغاء</Button>
+                          <Button variant="destructive" onClick={() => deleteMutation.mutate(a.id)} disabled={deleteMutation.isPending}>
+                            {deleteMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                            حذف
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}

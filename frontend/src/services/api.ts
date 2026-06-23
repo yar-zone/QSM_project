@@ -39,7 +39,7 @@ export const authApi = {
 }
 
 export const dashboardApi = {
-  get: () => api.get('/dashboard').then(r => r.data.data),
+  get: (params?: Record<string, string>) => api.get('/dashboard', { params }).then(r => r.data.data),
 }
 
 export const userApi = {
@@ -175,6 +175,8 @@ export const attendanceApi = {
   update: (id: number, data: Partial<Attendance>) => api.put<ApiResponse<Attendance>>(`/attendances/${id}`, data).then(r => r.data.data),
   delete: (id: number) => api.delete<ApiResponse<null>>(`/attendances/${id}`).then(r => r.data),
   bulk: (data: { class_id: number; date: string; attendances: { student_id: number; status: string; notes?: string }[] }) => api.post<ApiResponse<Attendance[]>>('/attendances/bulk', data).then(r => r.data.data),
+  reports: (params?: Record<string, string>) => api.get('/attendances/reports', { params }).then(r => r.data.data),
+  classReports: (params?: Record<string, string>) => api.get('/attendances/class-reports', { params }).then(r => extractArray<AttendanceClassReport>(r.data.data)),
 }
 
 export const notificationApi = {

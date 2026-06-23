@@ -22,16 +22,16 @@ export function AppSidebar() {
   const items = navForRole(primaryRole);
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" side="right">
       <SidebarHeader>
         <div className="flex items-center gap-3 px-2 py-2">
           <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary to-secondary text-white shadow-sm">
             <BookOpen className="h-5 w-5" />
           </span>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <p className="truncate font-display text-base font-bold leading-none text-sidebar-foreground">Nur Quran</p>
+            <p className="truncate font-display text-base font-bold leading-none text-sidebar-foreground">نور القرآن</p>
             <p className="mt-0.5 truncate text-xs text-sidebar-foreground/60">
-              {primaryRole ? ROLE_LABELS[primaryRole] : "Member"}
+              {primaryRole ? ROLE_LABELS[primaryRole] : "عضو"}
             </p>
           </div>
         </div>
@@ -39,7 +39,7 @@ export function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel>القائمة</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => {

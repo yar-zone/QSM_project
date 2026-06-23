@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/levels")({
   component: LevelsPage,
@@ -21,10 +22,12 @@ export const Route = createFileRoute("/_authenticated/levels")({
 
 function LevelsPage() {
   const { isAdmin, isOrganizer } = useAuth()
+  const canManage = isAdmin || isOrganizer
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isChildRoute = pathname !== "/levels"
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
+  const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const { data: levels, isLoading } = useQuery({
     queryKey: ["levels"],
@@ -43,31 +46,32 @@ function LevelsPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => levelApi.delete(id),
     onSuccess: () => {
-      toast.success("Level deleted")
+      toast.success("تم حذف المستوى")
       queryClient.invalidateQueries({ queryKey: ["levels"] })
+      setDeleteId(null)
     },
-    onError: () => toast.error("Failed to delete level"),
+    onError: () => toast.error("فشل حذف المستوى"),
   })
 
   if (isChildRoute) return <Outlet />
 
   return (
     <div>
-      <PageHeader title="Levels" description="Manage academic levels.">
+      <PageHeader title="المستويات" description="إدارة المستويات الدراسية.">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search levels..."
+            placeholder="بحث عن مستوى..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-64 pl-9"
+            className="w-64 pr-9"
           />
         </div>
         {(isAdmin || isOrganizer) && (
           <a href="/levels/new">
             <Button>
               <Plus className="h-4 w-4" />
-              New Level
+              مستوى جديد
             </Button>
           </a>
         )}
@@ -81,7 +85,7 @@ function LevelsPage() {
         <Card>
           <CardContent className="grid place-items-center gap-2 py-16 text-center text-muted-foreground">
             <Inbox className="h-8 w-8" />
-            <p>{search ? "No levels match your search." : "No levels found."}</p>
+            <p>{search ? "لا يوجد مستويات تطابق بحثك." : "لم يتم العثور على مستويات."}</p>
           </CardContent>
         </Card>
       ) : (
@@ -90,11 +94,11 @@ function LevelsPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Order</TableHead>
-                  <TableHead>Status</TableHead>
-                  {(isAdmin || isOrganizer) && <TableHead className="w-24">Actions</TableHead>}
+                  <TableHead>الاسم</TableHead>
+                  <TableHead>الوصف</TableHead>
+                  <TableHead>الترتيب</TableHead>
+                  <TableHead>الحالة</TableHead>
+                  {canManage && <TableHead className="w-32 text-center">الإجراءات</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -105,31 +109,40 @@ function LevelsPage() {
                     <TableCell>{l.order}</TableCell>
                     <TableCell>
                       <Badge variant={l.is_active ? "default" : "secondary"}>
-                        {l.is_active ? "Active" : "Inactive"}
+                        {l.is_active ? "نشط" : "غير نشط"}
                       </Badge>
                     </TableCell>
-                    {(isAdmin || isOrganizer) && (
+                    {canManage && (
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center justify-center gap-1">
                           <a href={`/levels/${l.id}/edit`}>
-                            <Button variant="outline" size="icon">
+                            <Button variant="ghost" size="icon">
                               <Pencil className="h-4 w-4" />
                             </Button>
                           </a>
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            disabled={deleteMutation.isPending && deleteMutation.variables === l.id}
-                            onClick={() => {
-                              if (confirm("Are you sure?")) deleteMutation.mutate(l.id)
-                            }}
-                          >
-                            {deleteMutation.isPending && deleteMutation.variables === l.id ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </Button>
+                          <Dialog open={deleteId === l.id} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => setDeleteId(l.id)}>
+                                <Trash2 className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader><DialogTitle>تأكيد الحذف</DialogTitle>
+                                <DialogDescription>هل أنت متأكد من حذف المستوى {l.name}؟ لا يمكن التراجع عن هذا الإجراء.</DialogDescription>
+                              </DialogHeader>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setDeleteId(null)}>إلغاء</Button>
+                                <Button
+                                  variant="destructive"
+                                  onClick={() => deleteMutation.mutate(l.id)}
+                                  disabled={deleteMutation.isPending}
+                                >
+                                  {deleteMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                  حذف
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </div>
                       </TableCell>
                     )}

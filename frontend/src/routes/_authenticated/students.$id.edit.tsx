@@ -21,8 +21,8 @@ export const Route = createFileRoute("/_authenticated/students/$id/edit")({
 })
 
 const schema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(120),
-  email: z.string().trim().min(1, "Email is required").email("Invalid email"),
+  name: z.string().trim().min(1, "الاسم مطلوب").max(120),
+  email: z.string().trim().min(1, "البريد الإلكتروني مطلوب").email("بريد إلكتروني غير صالح"),
   phone: z.string().trim().max(30).optional().or(z.literal("")),
   date_of_birth: z.string().trim().optional().or(z.literal("")),
   gender: z.string().trim().optional().or(z.literal("")),
@@ -84,10 +84,10 @@ function EditStudentPage() {
         is_active: values.is_active,
         class_ids: values.class_ids || undefined,
       })
-      toast.success("Student updated")
+      toast.success("تم تحديث الطالب")
       navigate({ to: "/students" })
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Failed to update student")
+      toast.error(err?.response?.data?.message || "فشل تحديث الطالب")
     } finally {
       setSaving(false)
     }
@@ -103,37 +103,37 @@ function EditStudentPage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="Edit Student" description={`Editing ${student?.user?.name ?? "student"}.`}>
+      <PageHeader title="تعديل الطالب" description={`تعديل ${student?.user?.name ?? "student"}.`}>
         <Button variant="outline" asChild>
           <a href="/students">
             <ArrowLeft className="h-4 w-4" />
-            Back
+            رجوع
           </a>
         </Button>
       </PageHeader>
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
-          <CardTitle>Student Details</CardTitle>
+          <CardTitle>بيانات الطالب</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">الاسم الكامل</Label>
               <Input id="name" {...register("name")} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">البريد الإلكتروني</Label>
               <Input id="email" type="email" {...register("email")} />
               {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">الهاتف</Label>
               <Input id="phone" type="tel" {...register("phone")} />
             </div>
             <div className="space-y-2">
-              <Label>Classes</Label>
-              <p className="text-xs text-muted-foreground">Select classes this student is enrolled in.</p>
+              <Label>الفصول</Label>
+              <p className="text-xs text-muted-foreground">اختر الفصول التي سجّل فيها هذا الطالب.</p>
               <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto border rounded-md p-2">
                 {(classes ?? []).map((c: Classe) => (
                   <div key={c.id} className="flex items-center gap-2">
@@ -153,23 +153,23 @@ function EditStudentPage() {
               </div>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="date_of_birth">Date of Birth</Label>
+              <Label htmlFor="date_of_birth">تاريخ الميلاد</Label>
               <Input id="date_of_birth" type="date" {...register("date_of_birth")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="gender">Gender</Label>
+              <Label htmlFor="gender">الجنس</Label>
               <Input id="gender" {...register("gender")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="address">Address</Label>
+              <Label htmlFor="address">العنوان</Label>
               <Input id="address" {...register("address")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="emergency_contact">Emergency Contact</Label>
+              <Label htmlFor="emergency_contact">جهة اتصال للطوارئ</Label>
               <Input id="emergency_contact" {...register("emergency_contact")} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="enrollment_date">Enrollment Date</Label>
+              <Label htmlFor="enrollment_date">تاريخ التسجيل</Label>
               <Input id="enrollment_date" type="date" {...register("enrollment_date")} />
             </div>
             <div className="flex items-center gap-2">
@@ -180,11 +180,11 @@ function EditStudentPage() {
                 onChange={(e) => setValue("is_active", e.target.checked)}
                 className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               />
-              <Label htmlFor="is_active">Active</Label>
+              <Label htmlFor="is_active">نشط</Label>
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              حفظ التغييرات
             </Button>
           </form>
         </CardContent>

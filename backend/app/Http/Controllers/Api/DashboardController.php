@@ -20,13 +20,15 @@ class DashboardController extends Controller
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
+        $dateFrom = $request->get('date_from');
+        $dateTo = $request->get('date_to');
 
         $data = match ($user->role) {
-            'admin' => $this->adminDashboard(),
-            'organizer' => $this->organizerDashboard(),
+            'admin' => $this->adminDashboard($dateFrom, $dateTo),
+            'organizer' => $this->organizerDashboard($dateFrom, $dateTo),
             'teacher' => $this->teacherDashboard($user),
             'student' => $this->studentDashboard($user),
-            'parent' => $this->parentDashboard($user),
+            'parent' => $this->parentDashboard($user, $dateFrom, $dateTo),
             default => [],
         };
 
@@ -36,7 +38,29 @@ class DashboardController extends Controller
         ]);
     }
 
-    private function adminDashboard(): array
+    private function attendanceBreakdown(?string $dateFrom = null, ?string $dateTo = null): array
+    {
+        $query = Attendance::selectRaw("status, COUNT(*) as count");
+
+        if ($dateFrom) {
+            $query->where('date', '>=', $dateFrom);
+        }
+
+        if ($dateTo) {
+            $query->where('date', '<=', $dateTo);
+        }
+
+        $all = $query->groupBy('status')->pluck('count', 'status');
+
+        return [
+            'present' => $all['present'] ?? 0,
+            'absent' => $all['absent'] ?? 0,
+            'late' => $all['late'] ?? 0,
+            'excused' => $all['excused'] ?? 0,
+        ];
+    }
+
+    private function adminDashboard(?string $dateFrom = null, ?string $dateTo = null): array
     {
         $totalStudents = Student::count();
         $totalTeachers = Teacher::count();
@@ -44,8 +68,12 @@ class DashboardController extends Controller
         $totalLevels = Level::count();
         $totalUsers = User::count();
         $pendingUsers = User::where('status', 'pending')->count();
-        $totalAttendances = Attendance::count();
-        $presentAttendances = Attendance::where('status', 'present')->count();
+
+        $attQuery = Attendance::query();
+        if ($dateFrom) $attQuery->where('date', '>=', $dateFrom);
+        if ($dateTo) $attQuery->where('date', '<=', $dateTo);
+        $totalAttendances = (clone $attQuery)->count();
+        $presentAttendances = (clone $attQuery)->where('status', 'present')->count();
         $attendanceRate = $totalAttendances > 0 ? round(($presentAttendances / $totalAttendances) * 100, 2) : 0;
 
         return [
@@ -56,17 +84,22 @@ class DashboardController extends Controller
             'total_users' => $totalUsers,
             'pending_approvals' => $pendingUsers,
             'attendance_rate' => $attendanceRate,
+            'attendance_breakdown' => $this->attendanceBreakdown($dateFrom, $dateTo),
         ];
     }
 
-    private function organizerDashboard(): array
+    private function organizerDashboard(?string $dateFrom = null, ?string $dateTo = null): array
     {
         $totalStudents = Student::count();
         $totalTeachers = Teacher::count();
         $totalClasses = Classe::count();
         $totalLevels = Level::count();
-        $totalAttendances = Attendance::count();
-        $presentAttendances = Attendance::where('status', 'present')->count();
+
+        $attQuery = Attendance::query();
+        if ($dateFrom) $attQuery->where('date', '>=', $dateFrom);
+        if ($dateTo) $attQuery->where('date', '<=', $dateTo);
+        $totalAttendances = (clone $attQuery)->count();
+        $presentAttendances = (clone $attQuery)->where('status', 'present')->count();
         $attendanceRate = $totalAttendances > 0 ? round(($presentAttendances / $totalAttendances) * 100, 2) : 0;
 
         return [
@@ -75,6 +108,7 @@ class DashboardController extends Controller
             'total_classes' => $totalClasses,
             'total_levels' => $totalLevels,
             'attendance_rate' => $attendanceRate,
+            'attendance_breakdown' => $this->attendanceBreakdown($dateFrom, $dateTo),
         ];
     }
 
@@ -121,7 +155,7 @@ class DashboardController extends Controller
         ];
     }
 
-    private function parentDashboard(User $user): array
+    private function parentDashboard(User $user, ?string $dateFrom = null, ?string $dateTo = null): array
     {
         $studentIds = $user->parentStudents()->pluck('student_id');
         $children = Student::whereIn('id', $studentIds)->with('user')->get();
@@ -133,9 +167,12 @@ class DashboardController extends Controller
             $averageScore = MemorizationTracking::where('student_id', $child->id)->avg('performance_score');
             $totalSessions = MemorizationTracking::where('student_id', $child->id)->count();
 
-            $present = Attendance::where('student_id', $child->id)->where('status', 'present')->count();
-            $absent = Attendance::where('student_id', $child->id)->where('status', 'absent')->count();
-            $totalAtt = Attendance::where('student_id', $child->id)->count();
+            $attQuery = Attendance::where('student_id', $child->id);
+            if ($dateFrom) $attQuery->where('date', '>=', $dateFrom);
+            if ($dateTo) $attQuery->where('date', '<=', $dateTo);
+            $present = (clone $attQuery)->where('status', 'present')->count();
+            $absent = (clone $attQuery)->where('status', 'absent')->count();
+            $totalAtt = (clone $attQuery)->count();
 
             $childrenStats[] = [
                 'child' => $child,

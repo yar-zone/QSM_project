@@ -73,7 +73,9 @@ export interface ExamCommittee {
 }
 
 export interface ExamResult {
-  id: number; exam_request_id: number; exam_request?: ExamRequest
+  id: number; exam_request_id?: number; exam_request?: ExamRequest
+  student_id?: number; student?: Student
+  level_id?: number; level?: Level
   marks_obtained?: number; grade?: string; evaluator_notes?: string
   is_passed: boolean; evaluated_by?: number; evaluator?: User; evaluated_at?: string; created_at: string; updated_at: string
 }
@@ -148,9 +150,20 @@ export interface AuthResponse { success: boolean; data: { user: User; token: str
 export interface ApiResponse<T> { success: boolean; data: T; message?: string }
 export interface PaginatedResponse<T> { success: boolean; data: T[]; meta: { current_page: number; last_page: number; per_page: number; total: number }; message?: string }
 
+export interface AttendanceBreakdown {
+  present: number; absent: number; late: number; excused: number
+}
+
+export interface AttendanceClassReport {
+  class_id: number; class_name: string
+  present: number; absent: number; late: number; excused: number
+  total: number; attendance_percentage: number
+}
+
 export interface DashboardStats {
   total_students?: number; total_teachers?: number; total_classes?: number; total_levels?: number
   pending_approvals?: number; active_enrollments?: number; attendance_rate?: number
+  attendance_breakdown?: AttendanceBreakdown
   total_verses_memorized?: number; total_verses_revised?: number; average_performance_score?: number
   total_sessions?: number; my_classes?: number; my_students?: number
 }

@@ -11,7 +11,7 @@ class ExamResultController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $query = ExamResult::with(['examRequest.student.user', 'evaluatedBy']);
+        $query = ExamResult::with(['examRequest.student.user', 'student.user', 'level', 'evaluatedBy']);
 
         if ($request->has('exam_request_id')) {
             $query->where('exam_request_id', $request->exam_request_id);
@@ -19,6 +19,10 @@ class ExamResultController extends Controller
 
         if ($request->has('is_passed')) {
             $query->where('is_passed', $request->boolean('is_passed'));
+        }
+
+        if ($request->has('student_id')) {
+            $query->where('student_id', $request->student_id);
         }
 
         $perPage = $request->get('per_page', 15);
@@ -33,7 +37,8 @@ class ExamResultController extends Controller
     public function store(Request $request): JsonResponse
     {
         $request->validate([
-            'exam_request_id' => 'required|exists:exam_requests,id',
+            'student_id' => 'nullable|exists:students,id',
+            'level_id' => 'nullable|exists:levels,id',
             'marks_obtained' => 'nullable|numeric|min:0|max:999.99',
             'grade' => 'nullable|string',
             'evaluator_notes' => 'nullable|string',
@@ -41,7 +46,8 @@ class ExamResultController extends Controller
         ]);
 
         $result = ExamResult::create([
-            'exam_request_id' => $request->exam_request_id,
+            'student_id' => $request->student_id,
+            'level_id' => $request->level_id,
             'marks_obtained' => $request->marks_obtained,
             'grade' => $request->grade,
             'evaluator_notes' => $request->evaluator_notes,
@@ -50,7 +56,7 @@ class ExamResultController extends Controller
             'evaluated_at' => now(),
         ]);
 
-        $result->load(['examRequest.student.user', 'evaluatedBy']);
+        $result->load(['student.user', 'level', 'evaluatedBy']);
 
         return response()->json([
             'success' => true,
@@ -61,7 +67,7 @@ class ExamResultController extends Controller
 
     public function show(ExamResult $examResult): JsonResponse
     {
-        $examResult->load(['examRequest.student.user', 'evaluatedBy']);
+        $examResult->load(['examRequest.student.user', 'student.user', 'level', 'evaluatedBy']);
 
         return response()->json([
             'success' => true,
@@ -120,7 +126,8 @@ class ExamResultController extends Controller
         );
 
         $result->examRequest->update(['status' => 'completed']);
-        $result->load(['examRequest.student.user', 'evaluatedBy']);
+        $result->examRequest?->update(['status' => 'completed']);
+        $result->load(['examRequest.student.user', 'student.user', 'evaluatedBy']);
 
         return response()->json([
             'success' => true,
@@ -142,9 +149,11 @@ class ExamResultController extends Controller
             return response()->json(['success' => false, 'message' => 'Forbidden.'], 403);
         }
 
-        $query = ExamResult::whereHas('examRequest', function ($q) use ($studentIds) {
-            $q->whereIn('student_id', $studentIds);
-        })->with(['examRequest.student.user', 'evaluatedBy']);
+        $query = ExamResult::where(function ($q) use ($studentIds) {
+            $q->whereHas('examRequest', function ($q) use ($studentIds) {
+                $q->whereIn('student_id', $studentIds);
+            })->orWhereIn('student_id', $studentIds);
+        })->with(['examRequest.student.user', 'student.user', 'evaluatedBy']);
 
         $perPage = $request->get('per_page', 15);
         $results = $query->orderBy('created_at', 'desc')->paginate($perPage);

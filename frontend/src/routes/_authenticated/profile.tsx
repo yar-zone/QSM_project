@@ -40,10 +40,10 @@ function ProfilePage() {
     setSaving(true)
     try {
       await userApi.update(user.id, values as any)
-      toast.success("Profile updated")
+      toast.success("تم تحديث الملف الشخصي")
       await refresh()
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || "Update failed")
+      toast.error(err?.response?.data?.message || "فشل التحديث")
     } finally {
       setSaving(false)
     }
@@ -51,32 +51,32 @@ function ProfilePage() {
 
   return (
     <div className="max-w-xl">
-      <PageHeader title="My Profile" description="Manage your personal information." />
+      <PageHeader title="ملفي الشخصي" description="إدارة معلوماتك الشخصية." />
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Details</span>
+            <span>التفاصيل</span>
             <Badge variant="outline">{ROLE_LABELS[primaryRole as keyof typeof ROLE_LABELS]}</Badge>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">البريد الإلكتروني</Label>
               <Input id="email" value={user?.email ?? ""} disabled />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="name">Full name</Label>
+              <Label htmlFor="name">الاسم الكامل</Label>
               <Input id="name" {...register("name")} />
               {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">الهاتف</Label>
               <Input id="phone" type="tel" {...register("phone")} />
             </div>
             <Button type="submit" disabled={saving}>
-              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save changes
+              {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              حفظ التغييرات
             </Button>
           </form>
         </CardContent>
