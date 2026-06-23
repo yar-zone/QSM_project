@@ -1,0 +1,14 @@
+/vendor/
+/backend/vendor/
+/frontend/node_modules/
+node_modules/
+.env
+.env.*
+!.env.example
+/storage/*.key
+/backend/storage/*.key
+/.vite/
+/frontend/.vite/
+npm-debug.log
+yarn-error.log
+.DS_Store
