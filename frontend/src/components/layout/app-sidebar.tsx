@@ -24,17 +24,18 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-1.5">
-          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <BookOpen className="h-4 w-4" />
+        <div className="flex items-center gap-3 px-2 py-2">
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-primary to-secondary text-white shadow-sm">
+            <BookOpen className="h-5 w-5" />
           </span>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <p className="truncate font-display text-base font-bold leading-none">Nur Quran</p>
-            <p className="truncate text-xs text-sidebar-foreground/70">
+            <p className="truncate font-display text-base font-bold leading-none text-sidebar-foreground">Nur Quran</p>
+            <p className="mt-0.5 truncate text-xs text-sidebar-foreground/60">
               {primaryRole ? ROLE_LABELS[primaryRole] : "Member"}
             </p>
           </div>
         </div>
+        <div className="mx-3 h-px bg-gradient-to-r from-transparent via-sidebar-border to-transparent" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

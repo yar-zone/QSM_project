@@ -17,6 +17,7 @@ class Announcement extends Model
         'content',
         'category',
         'target_audience',
+        'meeting_link',
         'is_pinned',
         'published_at',
         'expires_at',

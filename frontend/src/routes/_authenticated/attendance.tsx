@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Inbox, Plus, Search } from "lucide-react"
+import { Inbox, Plus, Search } from "lucide-react"
 import { useState, useMemo } from "react"
 
 import { useAuth } from "@/hooks/use-auth"
@@ -8,11 +8,11 @@ import { useAuth } from "@/hooks/use-auth"
 import { attendanceApi } from "@/services/api"
 import type { Attendance } from "@/types"
 import { PageHeader } from "@/components/dashboard/page-header"
-import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { TableSkeleton } from "@/components/ui/table-skeleton"
 
 export const Route = createFileRoute("/_authenticated/attendance")({
   component: AttendancePage,
@@ -66,16 +66,17 @@ function AttendancePage() {
       </PageHeader>
 
       {isLoading ? (
-        <div className="grid place-items-center py-16 text-muted-foreground">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
+        <TableSkeleton rows={6} cols={6} />
       ) : filteredRecords.length === 0 ? (
-        <Card>
-          <CardContent className="grid place-items-center gap-2 py-16 text-center text-muted-foreground">
-            <Inbox className="h-8 w-8" />
-            <p>{search ? "No attendance records match your search." : "No attendance records found."}</p>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <span className="grid h-14 w-14 place-items-center rounded-full bg-accent text-accent-foreground">
+            <Inbox className="h-7 w-7" />
+          </span>
+          <div>
+            <p className="text-base font-medium text-foreground">{search ? "No results" : "No attendance records"}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{search ? "No records match your search." : "Record attendance to see it here."}</p>
+          </div>
+        </div>
       ) : (
         <div className="rounded-lg border shadow-[var(--shadow-card)]">
           <Table>

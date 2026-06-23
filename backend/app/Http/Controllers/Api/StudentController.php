@@ -134,8 +134,9 @@ class StudentController extends Controller
             'address' => 'nullable|string',
             'phone' => 'nullable|string|max:20',
             'emergency_contact' => 'nullable|string|max:20',
-            'guardian_id' => 'nullable|exists:users,id',
             'is_active' => 'nullable|boolean',
+            'class_ids' => 'nullable|array',
+            'class_ids.*' => 'exists:classes,id',
         ]);
 
         $userData = [];
@@ -148,11 +149,22 @@ class StudentController extends Controller
         }
 
         $student->update($request->only([
-            'guardian_id', 'enrollment_date', 'date_of_birth',
+            'enrollment_date', 'date_of_birth',
             'gender', 'address', 'phone', 'emergency_contact', 'is_active',
         ]));
 
-        $student->load(['user', 'guardian']);
+        if ($request->has('class_ids')) {
+            $student->enrollments()->delete();
+            foreach ($request->class_ids as $classId) {
+                Enrollment::create([
+                    'student_id' => $student->id,
+                    'class_id' => $classId,
+                    'status' => 'active',
+                ]);
+            }
+        }
+
+        $student->load(['user', 'enrollments.classe']);
 
         return response()->json([
             'success' => true,

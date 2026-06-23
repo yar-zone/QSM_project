@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Loader2, Plus, Inbox, Trash2, Pencil, Search } from "lucide-react"
+import { Plus, Inbox, Trash2, Pencil, Search } from "lucide-react"
 import { toast } from "sonner"
 import { useState, useMemo } from "react"
 
@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { TableSkeleton } from "@/components/ui/table-skeleton"
 
 export const Route = createFileRoute("/_authenticated/parents")({
   component: ParentsPage,
@@ -78,16 +79,19 @@ function ParentsPage() {
       </PageHeader>
 
       {isLoading ? (
-        <div className="grid place-items-center py-16 text-muted-foreground">
-          <Loader2 className="h-6 w-6 animate-spin" />
-        </div>
+        <TableSkeleton rows={6} cols={5} />
       ) : filteredParents.length === 0 ? (
-        <div className="grid place-items-center gap-2 py-16 text-center text-muted-foreground">
-          <Inbox className="h-8 w-8" />
-          <p>{search ? "No parents match your search." : "No parents found."}</p>
+        <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <span className="grid h-14 w-14 place-items-center rounded-full bg-accent text-accent-foreground">
+            <Inbox className="h-7 w-7" />
+          </span>
+          <div>
+            <p className="text-base font-medium text-foreground">{search ? "No results" : "No parents found"}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{search ? "No parents match your search." : "Create a parent account to get started."}</p>
+          </div>
         </div>
       ) : (
-        <div>
+        <div className="rounded-lg border shadow-[var(--shadow-card)] overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>
@@ -101,7 +105,7 @@ function ParentsPage() {
             </TableHeader>
             <TableBody>
               {filteredParents.map((parent: User) => {
-                const childrenCount = (parent as any).parentStudents?.length ?? 0
+                const childrenCount = (parent as any).parent_students?.length ?? 0
                 const initials = (parent.name || parent.email).slice(0, 2).toUpperCase()
                 return (
                   <TableRow key={parent.id}>

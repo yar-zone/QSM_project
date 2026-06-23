@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { Loader2, Inbox, Plus, Pin, PinOff, Search } from "lucide-react"
+import { Loader2, Inbox, Plus, Pin, PinOff, Search, Video, ExternalLink } from "lucide-react"
 import { useState, useMemo } from "react"
 
 import { useAuth } from "@/hooks/use-auth"
@@ -124,12 +124,26 @@ function AnnouncementsPage() {
               </CardHeader>
               <CardContent className="space-y-2">
                 <p className="text-sm text-muted-foreground line-clamp-3">{a.content}</p>
-                {a.category === "meetings" && a.meeting_link && (
-                  <div className="rounded-md bg-primary/5 p-3 border border-primary/20">
-                    <p className="text-xs font-medium text-primary mb-1">Meeting Link</p>
-                    <a href={a.meeting_link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline break-all">
-                      {a.meeting_link}
-                    </a>
+                {a.meeting_link && (
+                  <div className="rounded-lg border border-primary/20 bg-gradient-to-r from-primary/[0.04] to-transparent p-4">
+                    <div className="flex items-start gap-3">
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                        <Video className="h-5 w-5" />
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-foreground">Meeting Details</p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">Click the link below to join the meeting</p>
+                        <a
+                          href={a.meeting_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+                        >
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          Join Meeting
+                        </a>
+                      </div>
+                    </div>
                   </div>
                 )}
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
