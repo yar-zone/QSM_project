@@ -75,7 +75,8 @@ export function StaffDashboard({ isAdmin }: { isAdmin: boolean }) {
   const pendingCount = Array.isArray(pendingUsers) ? pendingUsers.length : 0
   const summary = report?.summary ?? {}
   const total = (summary.present ?? 0) + (summary.absent ?? 0) + (summary.late ?? 0) + (summary.excused ?? 0)
-  const pct = total > 0 ? Math.round(((summary.present ?? 0) / total) * 100) : 0
+  const attended = (summary.present ?? 0) + (summary.late ?? 0)
+  const pct = total > 0 ? Math.round((attended / total) * 100) : 0
 
   return (
     <div className="fade-in-up">

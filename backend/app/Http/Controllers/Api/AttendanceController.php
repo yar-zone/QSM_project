@@ -113,11 +113,13 @@ class AttendanceController extends Controller
         $request->validate([
             'status' => 'nullable|string',
             'notes' => 'nullable|string',
+            'date' => 'nullable|date',
         ]);
 
         $attendance->update([
             'status' => $request->status ?? $attendance->status,
             'notes' => $request->notes ?? $attendance->notes,
+            'date' => $request->date ?? $attendance->date,
             'marked_by' => $request->user()->id,
         ]);
 
@@ -254,8 +256,9 @@ class AttendanceController extends Controller
             'total' => $attendances->count(),
         ];
 
+        $attended = $summary['present'] + $summary['late'];
         $summary['attendance_percentage'] = $summary['total'] > 0
-            ? round(($summary['present'] / $summary['total']) * 100, 2)
+            ? round(($attended / $summary['total']) * 100, 2)
             : 0;
 
         return response()->json([
@@ -277,44 +280,44 @@ class AttendanceController extends Controller
             $classIds = $teacher ? $teacher->classes()->pluck('classes.id')->toArray() : [];
         }
 
-        $attendances = Attendance::selectRaw("class_id, status, COUNT(*) as count")
-            ->when($classIds !== null, fn($q) => $q->whereIn('class_id', $classIds))
-            ->when($request->has('date_from'), fn($q) => $q->where('date', '>=', $request->date_from))
-            ->when($request->has('date_to'), fn($q) => $q->where('date', '<=', $request->date_to))
-            ->groupBy('class_id', 'status')
-            ->get();
+        $query = \App\Models\Classe::selectRaw("
+                classes.id,
+                classes.name,
+                COALESCE(SUM(CASE WHEN attendances.status = 'present' THEN 1 ELSE 0 END), 0) as present,
+                COALESCE(SUM(CASE WHEN attendances.status = 'absent' THEN 1 ELSE 0 END), 0) as absent,
+                COALESCE(SUM(CASE WHEN attendances.status = 'late' THEN 1 ELSE 0 END), 0) as late,
+                COALESCE(SUM(CASE WHEN attendances.status = 'excused' THEN 1 ELSE 0 END), 0) as excused
+            ")
+            ->leftJoin('attendances', function ($join) use ($request) {
+                $join->on('attendances.class_id', '=', 'classes.id');
+                if ($request->has('date_from')) {
+                    $join->where('attendances.date', '>=', $request->date_from);
+                }
+                if ($request->has('date_to')) {
+                    $join->where('attendances.date', '<=', $request->date_to);
+                }
+            })
+            ->when($classIds !== null, fn($q) => $q->whereIn('classes.id', $classIds))
+            ->groupBy('classes.id', 'classes.name')
+            ->orderBy('classes.name');
 
-        $grouped = $attendances->groupBy('class_id');
-
-        $classes = \App\Models\Classe::whereIn('id', $grouped->keys())
-            ->get()
-            ->keyBy('id');
-
-        $result = [];
-        foreach ($grouped as $classId => $records) {
-            $present = $records->where('status', 'present')->sum('count');
-            $absent = $records->where('status', 'absent')->sum('count');
-            $late = $records->where('status', 'late')->sum('count');
-            $excused = $records->where('status', 'excused')->sum('count');
-            $total = $present + $absent + $late + $excused;
-
-            $result[] = [
-                'class_id' => (int) $classId,
-                'class_name' => $classes[$classId]->name ?? "فصل #$classId",
-                'present' => $present,
-                'absent' => $absent,
-                'late' => $late,
-                'excused' => $excused,
+        $results = $query->get()->map(function ($row) {
+            $total = $row->present + $row->absent + $row->late + $row->excused;
+            return [
+                'class_id' => (int) $row->id,
+                'class_name' => $row->name,
+                'present' => (int) $row->present,
+                'absent' => (int) $row->absent,
+                'late' => (int) $row->late,
+                'excused' => (int) $row->excused,
                 'total' => $total,
-                'attendance_percentage' => $total > 0 ? round(($present / $total) * 100, 2) : 0,
+                'attendance_percentage' => $total > 0 ? round((($row->present + $row->late) / $total) * 100, 2) : 0,
             ];
-        }
-
-        usort($result, fn($a, $b) => strcmp($a['class_name'], $b['class_name']));
+        });
 
         return response()->json([
             'success' => true,
-            'data' => $result,
+            'data' => $results,
         ]);
     }
 

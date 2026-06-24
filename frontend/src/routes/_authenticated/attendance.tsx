@@ -53,6 +53,7 @@ function AttendancePage() {
   const [editRecord, setEditRecord] = useState<Attendance | null>(null)
   const [editStatus, setEditStatus] = useState("present")
   const [editNotes, setEditNotes] = useState("")
+  const [editDate, setEditDate] = useState("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const { data: records, isLoading } = useQuery({
@@ -149,7 +150,7 @@ function AttendancePage() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => { setEditRecord(r); setEditStatus(r.status); setEditNotes(r.notes ?? ""); }}
+                              onClick={() => { setEditRecord(r); setEditStatus(r.status); setEditNotes(r.notes ?? ""); setEditDate(r.date); }}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -157,6 +158,10 @@ function AttendancePage() {
                           <DialogContent>
                             <DialogHeader><DialogTitle>تعديل الحضور</DialogTitle></DialogHeader>
                             <div className="space-y-4">
+                              <div className="space-y-1.5">
+                                <Label>التاريخ</Label>
+                                <Input type="date" value={editDate} onChange={(e) => setEditDate(e.target.value)} />
+                              </div>
                               <div className="space-y-1.5">
                                 <Label>الحالة</Label>
                                 <Select value={editStatus} onValueChange={setEditStatus}>
@@ -173,7 +178,7 @@ function AttendancePage() {
                                 <Textarea value={editNotes} onChange={(e) => setEditNotes(e.target.value)} />
                               </div>
                               <Button
-                                onClick={() => updateMutation.mutate({ id: r.id, data: { status: editStatus, notes: editNotes } })}
+                                onClick={() => updateMutation.mutate({ id: r.id, data: { status: editStatus, notes: editNotes, date: editDate } })}
                                 disabled={updateMutation.isPending}
                               >
                                 {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}

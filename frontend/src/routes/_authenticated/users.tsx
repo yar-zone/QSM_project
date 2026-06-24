@@ -30,7 +30,7 @@ function statusVariant(status: string): "default" | "secondary" | "destructive" 
 }
 
 function UsersPage() {
-  const { isAdmin, isOrganizer } = useAuth()
+  const { isAdmin, isOrganizer, user: currentUser } = useAuth()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
 
@@ -82,13 +82,15 @@ function UsersPage() {
 
   const userList = users ?? []
   const filteredUsers = useMemo(() => {
-    if (!search.trim()) return userList
-    return userList.filter((u: User) =>
+    let list = userList
+    if (currentUser) list = list.filter((u: User) => u.id !== currentUser.id)
+    if (!search.trim()) return list
+    return list.filter((u: User) =>
       (u.name ?? "").toLowerCase().includes(search.toLowerCase()) ||
       (u.email ?? "").toLowerCase().includes(search.toLowerCase()) ||
       (u.role ?? "").toLowerCase().includes(search.toLowerCase())
     )
-  }, [userList, search])
+  }, [userList, search, currentUser])
 
   return (
     <div>
