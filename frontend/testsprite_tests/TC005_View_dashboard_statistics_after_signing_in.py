@@ -34,7 +34,7 @@ async def run_test():
 
         # Interact with the page elements to simulate user flow
         # -> navigate
-        await page.goto("http://localhost:5175")
+        await page.goto("http://localhost:5173")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
@@ -45,19 +45,19 @@ async def run_test():
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -68,25 +68,25 @@ async def run_test():
         await elem.click(timeout=10000)
         
         # -> Open the Authentication page by navigating to the '/auth' URL so the login form can be loaded and retried.
-        await page.goto("http://localhost:5175/auth")
+        await page.goto("http://localhost:5173/auth")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
             pass
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -101,19 +101,19 @@ async def run_test():
         elem = page.get_by_role('button', name='لدي حساب بالفعل', exact=True)
         await elem.click(timeout=10000)
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)

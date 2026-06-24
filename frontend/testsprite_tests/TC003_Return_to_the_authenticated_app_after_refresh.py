@@ -47,19 +47,19 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the login form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the login form.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the login form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the login form.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the login form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the login form.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -71,23 +71,23 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
         # -> Enter the password 'password123' into the password field and click the 'تسجيل الدخول' (Login) button to attempt signing in again, then observe whether the app navigates to the dashboard.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
         # -> Enter the password 'password123' into the password field and click the 'تسجيل الدخول' (Login) button to attempt signing in again, then observe whether the app navigates to the dashboard.
         # تسجيل الدخول button
@@ -101,19 +101,19 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form and observe whether the app navigates to the dashboard.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form and observe whether the app navigates to the dashboard.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form and observe whether the app navigates to the dashboard.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form and observe whether the app navigates to the dashboard.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form and observe whether the app navigates to the dashboard.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Login) button to submit the form and observe whether the app navigates to the dashboard.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -134,7 +134,7 @@ async def run_test():
         # Assert: Expected URL to contain '/dashboard' so the user remains in the authenticated app.
         await expect(page).to_have_url(re.compile("/dashboard"), timeout=15000), "Expected URL to contain '/dashboard' so the user remains in the authenticated app."
         # Assert: Expected the 'تسجيل الدخول' button to not be visible when the user remains authenticated.
-        await expect(page.locator("xpath=/html/body/div[1]/div/div/div[2]/form/button").nth(0)).not_to_be_visible(timeout=15000), "Expected the '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' button to not be visible when the user remains authenticated."
+        await expect(page.get_by_role('button', name='تسجيل الدخول')).not_to_be_visible(timeout=15000), "Expected the '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' button to not be visible when the user remains authenticated."
         
         # --> Verify dashboard content is displayed
         # Assert: Expected URL to contain '/dashboard' indicating the dashboard page is displayed.

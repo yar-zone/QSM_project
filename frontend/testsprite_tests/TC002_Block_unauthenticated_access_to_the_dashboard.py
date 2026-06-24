@@ -34,14 +34,14 @@ async def run_test():
 
         # Interact with the page elements to simulate user flow
         # -> navigate
-        await page.goto("http://localhost:5175")
+        await page.goto("http://localhost:5173")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
             pass
         
         # -> Navigate to the '/dashboard' path to verify the app redirects to the authentication flow instead of displaying dashboard content.
-        await page.goto("http://localhost:5175/dashboard")
+        await page.goto("http://localhost:5173/dashboard")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
@@ -53,10 +53,10 @@ async def run_test():
         # Assert: The app redirected to the authentication page (/auth?mode=login).
         await expect(page).to_have_url(re.compile("/auth\\?mode=login"), timeout=15000), "The app redirected to the authentication page (/auth?mode=login)."
         # Assert: The login button with text 'تسجيل الدخول' is visible on the auth page.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/button").nth(0)).to_have_text("\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644", timeout=15000), "The login button with text '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' is visible on the auth page."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0).scroll_into_view_if_needed()
+        await expect(page.get_by_role('button', name='تسجيل الدخول')).to_have_text("\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644", timeout=15000), "The login button with text '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' is visible on the auth page."
+        await page.locator('#email').scroll_into_view_if_needed()
         # Assert: The email input field is present on the authentication form.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0)).to_be_visible(timeout=15000), "The email input field is present on the authentication form."
+        await expect(page.locator('#email')).to_be_visible(timeout=15000), "The email input field is present on the authentication form."
         
         # --> Verify dashboard content is not displayed
         # Assert: Redirected to /auth?mode=login, so the dashboard content is not displayed.

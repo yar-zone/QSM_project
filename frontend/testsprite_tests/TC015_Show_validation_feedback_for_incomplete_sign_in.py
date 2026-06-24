@@ -34,14 +34,14 @@ async def run_test():
 
         # Interact with the page elements to simulate user flow
         # -> navigate
-        await page.goto("http://localhost:5175")
+        await page.goto("http://localhost:5173")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
             pass
         
         # -> Navigate to the authentication page (the '/auth' sign-in page) so the login form can be submitted empty.
-        await page.goto("http://localhost:5175/auth")
+        await page.goto("http://localhost:5173/auth")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
@@ -55,15 +55,15 @@ async def run_test():
         # --> Assertions to verify final state
         
         # --> Verify the auth form remains visible
-        await page.locator("xpath=/html/body/div[1]/div/div/div[2]/form/div[1]/input").nth(0).scroll_into_view_if_needed()
+        await page.locator('#email').scroll_into_view_if_needed()
         # Assert: The email input is visible on the auth page.
-        await expect(page.locator("xpath=/html/body/div[1]/div/div/div[2]/form/div[1]/input").nth(0)).to_be_visible(timeout=15000), "The email input is visible on the auth page."
-        await page.locator("xpath=/html/body/div[1]/div/div/div[2]/form/div[2]/input").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#email')).to_be_visible(timeout=15000), "The email input is visible on the auth page."
+        await page.locator('#password').scroll_into_view_if_needed()
         # Assert: The password input is visible on the auth page.
-        await expect(page.locator("xpath=/html/body/div[1]/div/div/div[2]/form/div[2]/input").nth(0)).to_be_visible(timeout=15000), "The password input is visible on the auth page."
-        await page.locator("xpath=/html/body/div[1]/div/div/div[2]/form/button").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#password')).to_be_visible(timeout=15000), "The password input is visible on the auth page."
+        await page.get_by_role('button', name='تسجيل الدخول').scroll_into_view_if_needed()
         # Assert: The 'تسجيل الدخول' button is visible on the auth page.
-        await expect(page.locator("xpath=/html/body/div[1]/div/div/div[2]/form/button").nth(0)).to_be_visible(timeout=15000), "The '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' button is visible on the auth page."
+        await expect(page.get_by_role('button', name='تسجيل الدخول')).to_be_visible(timeout=15000), "The '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' button is visible on the auth page."
         current_url = await page.evaluate("() => window.location.href")
         # Assert: page loaded with a URL (final outcome verified by the AI judge during the run)
         assert current_url, 'Page should have loaded with a URL'

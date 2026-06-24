@@ -57,26 +57,26 @@ async def run_test():
         # --> Assertions to verify final state
         
         # --> Verify the login screen is shown
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0).scroll_into_view_if_needed()
+        await page.locator('#email').scroll_into_view_if_needed()
         # Assert: The email input field is visible on the login screen.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0)).to_be_visible(timeout=15000), "The email input field is visible on the login screen."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/div[2]/input").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#email')).to_be_visible(timeout=15000), "The email input field is visible on the login screen."
+        await page.locator('#password').scroll_into_view_if_needed()
         # Assert: The password input field is visible on the login screen.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/div[2]/input").nth(0)).to_be_visible(timeout=15000), "The password input field is visible on the login screen."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/button").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#password')).to_be_visible(timeout=15000), "The password input field is visible on the login screen."
+        await page.get_by_role('button', name='تسجيل الدخول').scroll_into_view_if_needed()
         # Assert: The 'تسجيل الدخول' submit button is visible on the login screen.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/button").nth(0)).to_be_visible(timeout=15000), "The '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' submit button is visible on the login screen."
+        await expect(page.get_by_role('button', name='تسجيل الدخول')).to_be_visible(timeout=15000), "The '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' submit button is visible on the login screen."
         
         # --> Verify access to the protected app is blocked
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0).scroll_into_view_if_needed()
+        await page.locator('#email').scroll_into_view_if_needed()
         # Assert: Email input field is visible on the login screen.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0)).to_be_visible(timeout=15000), "Email input field is visible on the login screen."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/div[2]/input").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#email')).to_be_visible(timeout=15000), "Email input field is visible on the login screen."
+        await page.locator('#password').scroll_into_view_if_needed()
         # Assert: Password input field is visible on the login screen.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/div[2]/input").nth(0)).to_be_visible(timeout=15000), "Password input field is visible on the login screen."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/button").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#password')).to_be_visible(timeout=15000), "Password input field is visible on the login screen."
+        await page.get_by_role('button', name='تسجيل الدخول').scroll_into_view_if_needed()
         # Assert: The login submit button labeled 'تسجيل الدخول' is visible, indicating access is redirected to login.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/button").nth(0)).to_be_visible(timeout=15000), "The login submit button labeled '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' is visible, indicating access is redirected to login."
+        await expect(page.get_by_role('button', name='تسجيل الدخول')).to_be_visible(timeout=15000), "The login submit button labeled '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' is visible, indicating access is redirected to login."
         await asyncio.sleep(5)
 
     finally:

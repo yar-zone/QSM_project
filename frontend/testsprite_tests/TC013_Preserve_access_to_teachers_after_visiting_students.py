@@ -34,7 +34,7 @@ async def run_test():
 
         # Interact with the page elements to simulate user flow
         # -> navigate
-        await page.goto("http://localhost:5175")
+        await page.goto("http://localhost:5173")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
@@ -45,19 +45,19 @@ async def run_test():
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
         
-        # -> Fill the 'البريد الإلكتروني' field with example@gmail.com, fill the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to sign in.
+        # -> Fill the 'البريد الإلكتروني' field with admin@qsm.com, fill the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to sign in.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the 'البريد الإلكتروني' field with example@gmail.com, fill the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to sign in.
+        # -> Fill the 'البريد الإلكتروني' field with admin@qsm.com, fill the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to sign in.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the 'البريد الإلكتروني' field with example@gmail.com, fill the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to sign in.
+        # -> Fill the 'البريد الإلكتروني' field with admin@qsm.com, fill the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to sign in.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -72,19 +72,19 @@ async def run_test():
         elem = page.get_by_role('button', name='لدي حساب بالفعل', exact=True)
         await elem.click(timeout=10000)
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', and click the 'تسجيل الدخول' button to attempt sign-in.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', and click the 'تسجيل الدخول' button to attempt sign-in.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', and click the 'تسجيل الدخول' button to attempt sign-in.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', and click the 'تسجيل الدخول' button to attempt sign-in.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the email field with 'example@gmail.com', fill the password field with 'password123', and click the 'تسجيل الدخول' button to attempt sign-in.
+        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', and click the 'تسجيل الدخول' button to attempt sign-in.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -120,7 +120,7 @@ async def run_test():
         # 6 أحرف على الأقل password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
         # -> Select the 'معلم' (Teacher) role, fill the full name, email, and password fields, then click the 'إنشاء حساب' (Create account) button to attempt account creation.
         # إنشاء حساب button
@@ -136,7 +136,7 @@ async def run_test():
         
         # --> Verify the teacher list is displayed
         # Assert: The page shows the 'معلم' label, indicating the teacher list is displayed.
-        await expect(page.locator("xpath=/html/body/div").nth(0)).to_contain_text("\u0645\u0639\u0644\u0645", timeout=15000), "The page shows the '\u0645\u0639\u0644\u0645' label, indicating the teacher list is displayed."
+        await expect(page.locator('body')).to_contain_text("\u0645\u0639\u0644\u0645", timeout=15000), "The page shows the '\u0645\u0639\u0644\u0645' label, indicating the teacher list is displayed."
         await asyncio.sleep(5)
 
     finally:

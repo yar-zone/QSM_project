@@ -77,7 +77,7 @@ class UserController extends Controller
 
     public function pending(): JsonResponse
     {
-        $users = User::where('status', 'pending')->get();
+        $users = User::where('status', 'pending')->whereNotNull('email_verified_at')->get();
 
         return response()->json([
             'success' => true,

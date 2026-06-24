@@ -10,12 +10,14 @@ class EmailVerificationCode extends Model
         'email',
         'code',
         'expires_at',
+        'data',
     ];
 
     protected function casts(): array
     {
         return [
             'expires_at' => 'datetime',
+            'data' => 'array',
         ];
     }
 }

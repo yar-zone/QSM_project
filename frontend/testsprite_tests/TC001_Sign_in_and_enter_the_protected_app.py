@@ -45,19 +45,19 @@ async def run_test():
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
         
-        # -> Fill the 'البريد الإلكتروني' field with example@gmail.com and the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to submit the form.
+        # -> Fill the 'البريد الإلكتروني' field with admin@qsm.com and the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to submit the form.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the 'البريد الإلكتروني' field with example@gmail.com and the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to submit the form.
+        # -> Fill the 'البريد الإلكتروني' field with admin@qsm.com and the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to submit the form.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the 'البريد الإلكتروني' field with example@gmail.com and the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to submit the form.
+        # -> Fill the 'البريد الإلكتروني' field with admin@qsm.com and the 'كلمة المرور' field with password123, then click the 'تسجيل الدخول' button to submit the form.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -74,19 +74,19 @@ async def run_test():
         except Exception:
             pass
         
-        # -> Fill the 'البريد الإلكتروني' (email) field with example@gmail.com, fill the 'كلمة المرور' (password) field with password123, then click the 'تسجيل الدخول' button to submit the form.
+        # -> Fill the 'البريد الإلكتروني' (email) field with admin@qsm.com, fill the 'كلمة المرور' (password) field with password123, then click the 'تسجيل الدخول' button to submit the form.
         # بريدك@example.com email field
         elem = page.locator('[id="email"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("example@gmail.com")
+        await elem.fill("admin@qsm.com")
         
-        # -> Fill the 'البريد الإلكتروني' (email) field with example@gmail.com, fill the 'كلمة المرور' (password) field with password123, then click the 'تسجيل الدخول' button to submit the form.
+        # -> Fill the 'البريد الإلكتروني' (email) field with admin@qsm.com, fill the 'كلمة المرور' (password) field with password123, then click the 'تسجيل الدخول' button to submit the form.
         # •••••••• password field
         elem = page.locator('[id="password"]')
         await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password123")
+        await elem.fill("password")
         
-        # -> Fill the 'البريد الإلكتروني' (email) field with example@gmail.com, fill the 'كلمة المرور' (password) field with password123, then click the 'تسجيل الدخول' button to submit the form.
+        # -> Fill the 'البريد الإلكتروني' (email) field with admin@qsm.com, fill the 'كلمة المرور' (password) field with password123, then click the 'تسجيل الدخول' button to submit the form.
         # تسجيل الدخول button
         elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
         await elem.click(timeout=10000)
@@ -99,9 +99,9 @@ async def run_test():
         
         # --> Verify protected app navigation is available
         # Assert: Expected protected navigation to include a 'لوحة القيادة' link.
-        await expect(page.locator("xpath=/html/body/div").nth(0)).to_contain_text("\u0644\u0648\u062d\u0629 \u0627\u0644\u0642\u064a\u0627\u062f\u0629", timeout=15000), "Expected protected navigation to include a '\u0644\u0648\u062d\u0629 \u0627\u0644\u0642\u064a\u0627\u062f\u0629' link."
+        await expect(page.locator('body')).to_contain_text("\u0644\u0648\u062d\u0629 \u0627\u0644\u0642\u064a\u0627\u062f\u0629", timeout=15000), "Expected protected navigation to include a '\u0644\u0648\u062d\u0629 \u0627\u0644\u0642\u064a\u0627\u062f\u0629' link."
         # Assert: Expected protected navigation link to point to the authenticated app at /app.
-        await expect(page.locator("xpath=/html/body/div/div/div/div/a").nth(0)).to_have_attribute("href", "/app", timeout=15000), "Expected protected navigation link to point to the authenticated app at /app."
+        await expect(page.get_by_role('link', name='الرجوع للرئيسية')).to_have_attribute("href", "/app", timeout=15000), "Expected protected navigation link to point to the authenticated app at /app."
         await asyncio.sleep(5)
 
     finally:

@@ -74,37 +74,27 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => $request->password,
-            'role' => $request->role,
-            'status' => 'pending',
-        ]);
-
-        if ($request->role === 'teacher') {
-            $user->teacher()->create([]);
-        } elseif ($request->role === 'student') {
-            $user->student()->create([]);
-        } elseif ($request->role === 'parent') {
-            // No separate profile table for parents; user record is sufficient
-        }
-
-        $this->sendVerificationCode($user);
+        $this->sendVerificationCode(
+            email: $request->email,
+            name: $request->name,
+            data: [
+                'name' => $request->name,
+                'password' => $request->password,
+                'role' => $request->role,
+                'phone' => $request->phone,
+            ]
+        );
 
         return response()->json([
             'success' => true,
-            'data' => [
-                'email' => $user->email,
-            ],
-            'message' => 'تم إنشاء الحساب. يرجى التحقق من بريدك الإلكتروني.',
+            'message' => 'تم إرسال كود التحقق إلى بريدك الإلكتروني.',
         ], 201);
     }
 
     public function verifyEmail(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
             'code' => 'required|string|size:6',
         ]);
 
@@ -120,33 +110,56 @@ class AuthController extends Controller
             ], 422);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $data = $record->data;
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $request->email,
+            'password' => $data['password'],
+            'role' => $data['role'],
+            'status' => 'pending',
+        ]);
+
+        if ($data['role'] === 'teacher') {
+            $user->teacher()->create([]);
+        } elseif ($data['role'] === 'student') {
+            $user->student()->create([]);
+        }
+
         $user->update(['email_verified_at' => Carbon::now()]);
 
         $record->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'تم التحقق من البريد الإلكتروني بنجاح. حسابك قيد انتظار موافقة الإدارة.',
+            'message' => 'تم إنشاء الحساب بعد التحقق. حسابك قيد انتظار موافقة الإدارة.',
         ]);
     }
 
     public function resendVerificationCode(Request $request): JsonResponse
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $record = EmailVerificationCode::where('email', $request->email)
+            ->where('expires_at', '>', Carbon::now())
+            ->first();
 
-        if ($user->email_verified_at) {
+        if (!$record) {
             return response()->json([
                 'success' => false,
-                'message' => 'البريد الإلكتروني موثق بالفعل.',
+                'message' => 'لم يتم العثور على طلب تسجيل بهذا البريد الإلكتروني.',
             ], 422);
         }
 
-        $this->sendVerificationCode($user);
+        $data = $record->data;
+
+        $this->sendVerificationCode(
+            email: $request->email,
+            name: $data['name'] ?? $request->email,
+            data: $data,
+        );
 
         return response()->json([
             'success' => true,
@@ -154,20 +167,26 @@ class AuthController extends Controller
         ]);
     }
 
-    private function sendVerificationCode(User $user): void
+    private function sendVerificationCode(string $email, string $name, ?array $data = null): void
     {
-        EmailVerificationCode::where('email', $user->email)->delete();
+        EmailVerificationCode::where('email', $email)->delete();
 
         $code = str_pad((string) random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
 
-        EmailVerificationCode::create([
-            'email' => $user->email,
+        $recordData = [
+            'email' => $email,
             'code' => $code,
             'expires_at' => Carbon::now()->addMinutes(10),
-        ]);
+        ];
+
+        if ($data !== null) {
+            $recordData['data'] = $data;
+        }
+
+        EmailVerificationCode::create($recordData);
 
         try {
-            Mail::to($user->email)->send(new VerificationCodeMail($code, $user->name));
+            Mail::to($email)->send(new VerificationCodeMail($code, $name));
         } catch (\Exception $e) {
             // Log silently — mail config may not be set up
         }

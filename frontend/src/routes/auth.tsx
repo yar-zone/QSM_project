@@ -1,6 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
-import { Loader2, BookOpen } from "lucide-react"
+import { Loader2, BookOpen, Home, Eye, EyeOff } from "lucide-react"
 import { GoogleLogin } from "@react-oauth/google"
 import { toast } from "sonner"
 
@@ -29,6 +29,9 @@ function AuthPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center bg-background px-4 py-10 pattern-dots">
+      <Link to="/" className="fixed right-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground shadow-sm transition-colors hover:bg-accent hover:text-foreground">
+        <Home className="h-5 w-5" />
+      </Link>
       <div className="w-full max-w-md fade-in-up">
         <div className="mb-8 text-center">
           <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary text-white shadow-lg shadow-primary/25">
@@ -59,6 +62,20 @@ function AuthPage() {
           </p>
         </div>
       </div>
+    </div>
+  )
+}
+
+function PasswordInput({ id, value, onChange, placeholder, autoComplete }: {
+  id: string; value: string; onChange: (v: string) => void; placeholder: string; autoComplete: string
+}) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="relative">
+      <Input id={id} type={show ? "text" : "password"} value={value} onChange={e => onChange(e.target.value)} autoComplete={autoComplete} placeholder={placeholder} className="pl-10" />
+      <button type="button" onClick={() => setShow(!show)} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors" tabIndex={-1}>
+        {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
     </div>
   )
 }
@@ -98,7 +115,7 @@ function LoginForm() {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="password">كلمة المرور</Label>
-        <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
+        <PasswordInput id="password" value={password} onChange={setPassword} autoComplete="current-password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" />
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
       <Button type="submit" disabled={submitting} className="w-full">
@@ -261,7 +278,7 @@ function RegisterForm() {
       </div>
       <div className="space-y-1.5">
         <Label htmlFor="password">كلمة المرور</Label>
-        <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} autoComplete="new-password" placeholder="6 أحرف على الأقل" />
+        <PasswordInput id="password" value={password} onChange={setPassword} autoComplete="new-password" placeholder="6 أحرف على الأقل" />
       </div>
       {error && <p className="text-xs text-destructive">{error}</p>}
       <Button type="submit" disabled={submitting} className="w-full">

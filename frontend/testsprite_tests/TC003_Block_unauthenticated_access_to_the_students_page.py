@@ -34,14 +34,14 @@ async def run_test():
 
         # Interact with the page elements to simulate user flow
         # -> navigate
-        await page.goto("http://localhost:5175")
+        await page.goto("http://localhost:5173")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
             pass
         
         # -> Open the Students page by navigating to the '/students' path and verify the app shows the authentication flow (login/signup) and that the students list is not displayed.
-        await page.goto("http://localhost:5175/students")
+        await page.goto("http://localhost:5173/students")
         try:
             await page.wait_for_load_state("domcontentloaded", timeout=5000)
         except Exception:
@@ -52,18 +52,18 @@ async def run_test():
         # --> Verify the auth flow is shown
         # Assert: The app redirected to the auth login URL.
         await expect(page).to_have_url(re.compile("/auth\\?mode=login"), timeout=15000), "The app redirected to the auth login URL."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0).scroll_into_view_if_needed()
+        await page.locator('#email').scroll_into_view_if_needed()
         # Assert: The email input for login is visible.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/div[1]/input").nth(0)).to_be_visible(timeout=15000), "The email input for login is visible."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/div[2]/input").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#email')).to_be_visible(timeout=15000), "The email input for login is visible."
+        await page.locator('#password').scroll_into_view_if_needed()
         # Assert: The password input for login is visible.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/div[2]/input").nth(0)).to_be_visible(timeout=15000), "The password input for login is visible."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/form/button").nth(0).scroll_into_view_if_needed()
+        await expect(page.locator('#password')).to_be_visible(timeout=15000), "The password input for login is visible."
+        await page.get_by_role('button', name='تسجيل الدخول').scroll_into_view_if_needed()
         # Assert: The 'تسجيل الدخول' button is visible.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/form/button").nth(0)).to_be_visible(timeout=15000), "The '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' button is visible."
-        await page.locator("xpath=/html/body/div/div/div/div[2]/p/button").nth(0).scroll_into_view_if_needed()
+        await expect(page.get_by_role('button', name='تسجيل الدخول')).to_be_visible(timeout=15000), "The '\u062a\u0633\u062c\u064a\u0644 \u0627\u0644\u062f\u062e\u0648\u0644' button is visible."
+        await page.get_by_role('button', name='إنشاء حساب').scroll_into_view_if_needed()
         # Assert: The 'إنشاء حساب' (create account) option is visible.
-        await expect(page.locator("xpath=/html/body/div/div/div/div[2]/p/button").nth(0)).to_be_visible(timeout=15000), "The '\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628' (create account) option is visible."
+        await expect(page.get_by_role('button', name='إنشاء حساب')).to_be_visible(timeout=15000), "The '\u0625\u0646\u0634\u0627\u0621 \u062d\u0633\u0627\u0628' (create account) option is visible."
         
         # --> Verify student list content is not displayed
         # Assert: Redirected to /auth?mode=login, so the student list content is not displayed.
