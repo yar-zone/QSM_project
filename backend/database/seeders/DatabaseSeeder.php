@@ -6,6 +6,7 @@ use App\Models\Classe;
 use App\Models\Level;
 use App\Models\Organizer;
 use App\Models\Student;
+use App\Models\StudentParent;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\User;
@@ -57,10 +58,18 @@ class DatabaseSeeder extends Seeder
             'phone' => '0987654321',
         ]);
 
-        User::firstOrCreate(
+        $parentUser = User::firstOrCreate(
             ['email' => 'parent@qsm.com'],
             ['name' => 'Parent', 'password' => 'password', 'role' => 'parent', 'status' => 'active']
         );
+
+        if (!$student->guardian_id) {
+            $student->update(['guardian_id' => $parentUser->id]);
+        }
+        StudentParent::firstOrCreate([
+            'student_id' => $student->id,
+            'parent_id' => $parentUser->id,
+        ]);
 
         $level1 = Level::firstOrCreate(['name' => 'Beginner'], ['description' => 'Basic Quran reading', 'order' => 1]);
         $level2 = Level::firstOrCreate(['name' => 'Intermediate'], ['description' => 'Intermediate memorization', 'order' => 2]);

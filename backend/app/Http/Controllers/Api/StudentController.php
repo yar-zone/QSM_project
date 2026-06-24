@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Student;
 use App\Models\User;
 use App\Models\Enrollment;
+use App\Models\StudentParent;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -83,6 +84,13 @@ class StudentController extends Controller
             'guardian_id' => $request->guardian_id,
         ]);
 
+        if ($request->filled('guardian_id')) {
+            StudentParent::firstOrCreate([
+                'student_id' => $student->id,
+                'parent_id' => $request->guardian_id,
+            ]);
+        }
+
         if ($request->has('class_ids')) {
             foreach ($request->class_ids as $classId) {
                 Enrollment::create([
@@ -93,7 +101,7 @@ class StudentController extends Controller
             }
         }
 
-        $student->load(['user', 'enrollments.classe']);
+        $student->load(['user', 'enrollments.classe', 'guardian']);
 
         return response()->json([
             'success' => true,
@@ -157,6 +165,16 @@ class StudentController extends Controller
             'guardian_id',
         ]));
 
+        if ($request->has('guardian_id')) {
+            StudentParent::where('student_id', $student->id)->delete();
+            if ($request->filled('guardian_id')) {
+                StudentParent::create([
+                    'student_id' => $student->id,
+                    'parent_id' => $request->guardian_id,
+                ]);
+            }
+        }
+
         if ($request->has('class_ids')) {
             $student->enrollments()->delete();
             foreach ($request->class_ids as $classId) {
@@ -168,7 +186,7 @@ class StudentController extends Controller
             }
         }
 
-        $student->load(['user', 'enrollments.classe']);
+        $student->load(['user', 'enrollments.classe', 'guardian']);
 
         return response()->json([
             'success' => true,

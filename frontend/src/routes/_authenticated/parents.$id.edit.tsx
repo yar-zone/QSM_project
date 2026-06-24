@@ -41,7 +41,7 @@ function EditParentPage() {
 
   useEffect(() => {
     if (parent) {
-      const ids = (parent as any)?.parentStudents?.map((s: any) => s.id) ?? []
+      const ids = (parent as any)?.parent_students?.map((s: any) => s.id) ?? []
       setSelectedStudents(ids)
     }
   }, [parent])
@@ -57,7 +57,7 @@ function EditParentPage() {
       name: parent.name ?? "",
       email: parent.email ?? "",
       phone: parent.phone ?? "",
-      student_ids: (parent as any).parentStudents?.map((s: any) => s.id) ?? [],
+      student_ids: (parent as any).parent_students?.map((s: any) => s.id) ?? [],
     } : undefined,
   })
 

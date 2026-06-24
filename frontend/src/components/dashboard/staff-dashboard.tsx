@@ -17,7 +17,6 @@ const RANGE_OPTIONS = [
   { label: "شهر", days: 30 },
   { label: "15 يوم", days: 15 },
   { label: "7 أيام", days: 7 },
-  { label: "يوم", days: 1 },
 ]
 
 const STATS_CONFIG = [
@@ -100,11 +99,10 @@ export function StaffDashboard({ isAdmin }: { isAdmin: boolean }) {
             key={opt.days}
             type="button"
             onClick={() => setRangeDays(opt.days)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-              rangeDays === opt.days
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${rangeDays === opt.days
                 ? "bg-primary text-primary-foreground"
                 : "bg-accent text-accent-foreground hover:bg-accent/70"
-            }`}
+              }`}
           >
             {opt.label}
           </button>
