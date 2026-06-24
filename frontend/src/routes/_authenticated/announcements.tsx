@@ -33,11 +33,14 @@ function AudienceBadge({ audience }: { audience: string }) {
     parent: "bg-pink-500 text-white",
     all: "bg-primary text-primary-foreground",
   }
+  const labels: Record<string, string> = {
+    admin: "إدارة", organizer: "منظمون", teacher: "معلمون", student: "طلاب", parent: "أولياء أمور", all: "الجميع",
+  }
   return (
     <div className="flex flex-wrap gap-1">
       {roles.map((role) => (
         <Badge key={role} variant="outline" className={`text-xs ${colors[role] || ""}`}>
-          {role}
+          {labels[role] || role}
         </Badge>
       ))}
     </div>
@@ -52,8 +55,11 @@ function categoryBadge(category: string) {
     meetings: { variant: "outline", className: "" },
     urgent: { variant: "destructive", className: "" },
   }
+  const labels: Record<string, string> = {
+    general: "عام", exams: "امتحانات", events: "فعاليات", meetings: "اجتماعات", urgent: "عاجل",
+  }
   const b = map[category] ?? { variant: "secondary" as const, className: "" }
-  return <Badge variant={b.variant} className={b.className}>{category}</Badge>
+  return <Badge variant={b.variant} className={b.className}>{labels[category] || category}</Badge>
 }
 
 function AnnouncementsPage() {
@@ -181,6 +187,32 @@ function AnnouncementsPage() {
                     <>
                       <span>·</span>
                       <AudienceBadge audience={a.target_audience} />
+                    </>
+                  )}
+                  {a.targetClasses && a.targetClasses.length > 0 && (
+                    <>
+                      <span>·</span>
+                      {a.targetClasses.map((c) => (
+                        <Badge key={c.id} variant="outline" className="text-xs">
+                          {c.name}
+                        </Badge>
+                      ))}
+                    </>
+                  )}
+                  {a.targetClass && (!a.targetClasses || a.targetClasses.length === 0) && (
+                    <>
+                      <span>·</span>
+                      <Badge variant="outline" className="text-xs">
+                        {a.targetClass.name}
+                      </Badge>
+                    </>
+                  )}
+                  {a.targetUsers && a.targetUsers.length > 0 && (
+                    <>
+                      <span>·</span>
+                      <Badge variant="outline" className="text-xs">
+                        {a.targetUsers.length} مستخدم
+                      </Badge>
                     </>
                   )}
                 </div>

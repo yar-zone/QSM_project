@@ -6,8 +6,8 @@ import { toast } from "sonner"
 
 import { useAuth } from "@/hooks/use-auth"
 
-import { studentApi, classApi } from "@/services/api"
-import type { Student, Classe } from "@/types"
+import { studentApi, classApi, parentApi } from "@/services/api"
+import type { Student, Classe, User } from "@/types"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,7 @@ import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/students")({
@@ -36,6 +37,7 @@ function StudentsPage() {
   const [editPhone, setEditPhone] = useState("")
   const [editIsActive, setEditIsActive] = useState(true)
   const [editClassIds, setEditClassIds] = useState<number[]>([])
+  const [editGuardianId, setEditGuardianId] = useState<string>("")
   const { data, isLoading } = useQuery({
     queryKey: ["students"],
     queryFn: () => studentApi.list(),
@@ -44,6 +46,11 @@ function StudentsPage() {
   const { data: classes } = useQuery({
     queryKey: ["classes"],
     queryFn: () => classApi.list(),
+  })
+
+  const { data: parents } = useQuery({
+    queryKey: ["parents"],
+    queryFn: () => parentApi.list(),
   })
 
   const deleteMutation = useMutation({
@@ -74,6 +81,7 @@ function StudentsPage() {
     setEditPhone(s.phone ?? "")
     setEditIsActive(s.is_active)
     setEditClassIds((s as any).enrollments?.map((e: any) => e.class_id) ?? [])
+    setEditGuardianId(s.guardian_id ? String(s.guardian_id) : "")
     setEditId(s.id)
   }
 
@@ -132,6 +140,7 @@ function StudentsPage() {
                   <TableHead>الاسم</TableHead>
                   <TableHead>البريد الإلكتروني</TableHead>
                   <TableHead>الهاتف</TableHead>
+                  <TableHead>ولي الأمر</TableHead>
                   <TableHead>الحالة</TableHead>
                   <TableHead>التسجيل في الفصول</TableHead>
                     {canManage && <TableHead className="w-32 text-center">الإجراءات</TableHead>}
@@ -143,6 +152,7 @@ function StudentsPage() {
                     <TableCell className="font-medium">{s.user?.name ?? "—"}</TableCell>
                     <TableCell>{s.user?.email ?? "—"}</TableCell>
                     <TableCell>{s.phone || s.user?.phone || "—"}</TableCell>
+                    <TableCell>{s.guardian?.name || "—"}</TableCell>
                     <TableCell>
                       <Badge variant={s.is_active ? "default" : "secondary"}>
                         {s.is_active ? "نشط" : "غير نشط"}
@@ -191,6 +201,18 @@ function StudentsPage() {
                                     }) : <p className="text-sm text-muted-foreground">لا يوجد فصول متاحة.</p>}
                                   </div>
                                 </div>
+                                <div className="space-y-1.5">
+                                  <Label>ولي الأمر</Label>
+                                  <Select value={editGuardianId} onValueChange={setEditGuardianId}>
+                                    <SelectTrigger><SelectValue placeholder="اختر ولي أمر" /></SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="">بدون ولي أمر</SelectItem>
+                                      {(parents ?? []).map((p: User) => (
+                                        <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                                 <div className="flex items-center gap-2">
                                   <input
                                     id="edit_is_active"
@@ -205,7 +227,7 @@ function StudentsPage() {
                               <DialogFooter>
                                 <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
                                 <Button
-                                  onClick={() => updateMutation.mutate({ id: s.id, data: { name: editName, email: editEmail, phone: editPhone || undefined, is_active: editIsActive, class_ids: editClassIds } })}
+                                  onClick={() => updateMutation.mutate({ id: s.id, data: { name: editName, email: editEmail, phone: editPhone || undefined, is_active: editIsActive, class_ids: editClassIds, guardian_id: editGuardianId ? Number(editGuardianId) : undefined } })}
                                   disabled={updateMutation.isPending}
                                 >
                                   {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}

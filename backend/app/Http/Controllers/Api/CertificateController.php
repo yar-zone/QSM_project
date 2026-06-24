@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Certificate;
 use App\Models\Enrollment;
-use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Mpdf\Mpdf;
 
 class CertificateController extends Controller
 {
@@ -113,7 +113,9 @@ class CertificateController extends Controller
             'is_verified' => 'nullable|boolean',
         ]);
 
-        $certificate->update($request->all());
+        $certificate->update($request->only([
+            'student_name', 'hizb_count', 'grade', 'issued_date', 'certificate_type', 'is_verified',
+        ]));
 
         return response()->json([
             'success' => true,
@@ -143,29 +145,51 @@ class CertificateController extends Controller
         ]);
     }
 
+    private function generatePdfContent(Certificate $certificate): string
+    {
+        $typeLabel = $certificate->certificate_type === 'ijaza' ? 'إجازة' : 'شهادة حفظ';
+
+        $html = view('pdf.certificate', [
+            'student_name' => $certificate->student_name,
+            'hizb_count' => $certificate->hizb_count,
+            'grade' => $certificate->grade ?? '—',
+            'issued_date' => $certificate->issued_date->format('Y-m-d'),
+            'certificate_number' => $certificate->certificate_number,
+            'certificate_type' => $typeLabel,
+            'is_verified' => $certificate->is_verified,
+            'qr_code' => null,
+        ])->render();
+
+        $mpdf = new Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4-L',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'default_font' => 'dejavusans',
+        ]);
+
+        $mpdf->autoArabic = true;
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont = true;
+        $mpdf->WriteHTML($html);
+
+        return $mpdf->Output('', 'S');
+    }
+
     public function download(Certificate $certificate): JsonResponse
     {
         $certificate->load(['student.user', 'examResult']);
 
         try {
-            $pdf = Pdf::loadView('pdf.certificate', [
-                'student_name' => $certificate->student_name,
-                'hizb_count' => $certificate->hizb_count,
-                'grade' => $certificate->grade,
-                'issued_date' => $certificate->issued_date->format('Y-m-d'),
-                'certificate_number' => $certificate->certificate_number,
-                'certificate_type' => $certificate->certificate_type,
-                'is_verified' => $certificate->is_verified,
-                'qr_code' => null,
-            ]);
-
+            $pdfContent = $this->generatePdfContent($certificate);
             $filename = 'certificate-' . $certificate->certificate_number . '.pdf';
-            $pdfContent = base64_encode($pdf->output());
 
             return response()->json([
                 'success' => true,
                 'data' => [
-                    'pdf' => $pdfContent,
+                    'pdf' => base64_encode($pdfContent),
                     'filename' => $filename,
                 ],
                 'message' => 'Certificate PDF generated.',
@@ -200,25 +224,14 @@ class CertificateController extends Controller
         ]);
 
         try {
-            $pdf = Pdf::loadView('pdf.certificate', [
-                'student_name' => $certificate->student_name,
-                'hizb_count' => $certificate->hizb_count,
-                'grade' => $certificate->grade,
-                'issued_date' => $certificate->issued_date->format('Y-m-d'),
-                'certificate_number' => $certificate->certificate_number,
-                'certificate_type' => $certificate->certificate_type,
-                'is_verified' => $certificate->is_verified,
-                'qr_code' => null,
-            ]);
-
+            $pdfContent = $this->generatePdfContent($certificate);
             $filename = 'certificate-' . $certificate->certificate_number . '.pdf';
-            $pdfContent = base64_encode($pdf->output());
 
             return response()->json([
                 'success' => true,
                 'data' => [
                     'certificate' => $certificate,
-                    'pdf' => $pdfContent,
+                    'pdf' => base64_encode($pdfContent),
                     'filename' => $filename,
                 ],
                 'message' => 'Certificate generated successfully.',

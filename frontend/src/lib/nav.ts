@@ -16,7 +16,7 @@ export interface NavItem {
 export const NAV_ITEMS: NavItem[] = [
   { title: "لوحة التحكم", to: "/dashboard", icon: LayoutDashboard, roles: ["admin", "organizer", "teacher", "student", "parent"] },
   { title: "الموافقات", to: "/approvals", icon: UserCheck, roles: ["admin", "organizer"] },
-  { title: "أولياء الأمور", to: "/parents", icon: Users, roles: ["admin", "organizer", "teacher", "parent"] },
+  { title: "أولياء الأمور", to: "/parents", icon: Users, roles: ["admin", "organizer", "teacher"] },
   { title: "الطلاب", to: "/students", icon: GraduationCap, roles: ["admin", "organizer", "teacher"] },
   { title: "المعلمون", to: "/teachers", icon: Users, roles: ["admin", "organizer"] },
   { title: "الفصول", to: "/classes", icon: BookOpen, roles: ["admin", "organizer", "teacher"] },

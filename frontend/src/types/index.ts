@@ -91,6 +91,8 @@ export interface Certificate {
 export interface Announcement {
   id: number; author_id: number; author?: User; title: string; content: string
   category: AnnouncementCategory; target_audience: string; is_pinned: boolean
+  target_class_id?: number | null; targetClass?: Classe | null
+  targetClasses?: Classe[]; targetUsers?: User[]
   published_at: string; expires_at?: string; is_active: boolean; created_at: string; updated_at: string
   attachments?: AnnouncementAttachment[]; meeting_link?: string
 }

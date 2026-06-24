@@ -39,16 +39,24 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('students/{student}/attendance', [StudentController::class, 'attendance']);
     });
 
-    // Teachers: admin, organizer
+    // Teachers: admin, organizer (CRUD); read-only for teachers
     Route::middleware('role:admin,organizer')->group(function () {
-        Route::apiResource('teachers', TeacherController::class);
+        Route::apiResource('teachers', TeacherController::class)->except(['index', 'show']);
         Route::get('teachers/{teacher}/performance', [TeacherController::class, 'performance']);
         Route::get('teachers/{teacher}/classes', [TeacherController::class, 'classes']);
     });
+    Route::middleware('role:admin,organizer,teacher')->group(function () {
+        Route::get('teachers', [TeacherController::class, 'index']);
+        Route::get('teachers/{teacher}', [TeacherController::class, 'show']);
+    });
 
-    // Organizers: admin only
+    // Organizers: admin (CRUD); read-only for organizers and teachers
     Route::middleware('role:admin')->group(function () {
-        Route::apiResource('organizers', OrganizerController::class);
+        Route::apiResource('organizers', OrganizerController::class)->except(['index', 'show']);
+    });
+    Route::middleware('role:admin,organizer,teacher')->group(function () {
+        Route::get('organizers', [OrganizerController::class, 'index']);
+        Route::get('organizers/{organizer}', [OrganizerController::class, 'show']);
     });
 
     // Levels: admin, organizer
@@ -120,11 +128,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::middleware('role:admin,organizer,teacher,student,parent')->group(function () {
         Route::get('certificates/my', [CertificateController::class, 'myCertificates']);
+        Route::get('certificates/student/{student_id}', [CertificateController::class, 'studentCertificates']);
+        Route::get('certificates/{certificate}/download', [CertificateController::class, 'download']);
+        Route::post('certificates/{certificate}/verify', [CertificateController::class, 'verify']);
         Route::get('certificates', [CertificateController::class, 'index']);
         Route::get('certificates/{certificate}', [CertificateController::class, 'show']);
-        Route::post('certificates/{certificate}/verify', [CertificateController::class, 'verify']);
-        Route::get('certificates/{certificate}/download', [CertificateController::class, 'download']);
-        Route::get('certificates/student/{student_id}', [CertificateController::class, 'studentCertificates']);
     });
 
     // Announcements: all authenticated users read; admin/organizer/teacher CRUD
@@ -134,10 +142,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('announcements/{announcement}', [AnnouncementController::class, 'destroy']);
     });
     Route::middleware('role:admin,organizer,teacher,student,parent')->group(function () {
-        Route::get('announcements', [AnnouncementController::class, 'index']);
-        Route::get('announcements/{announcement}', [AnnouncementController::class, 'show']);
         Route::get('announcements/pinned', [AnnouncementController::class, 'pinned']);
         Route::get('announcements/targeted', [AnnouncementController::class, 'targeted']);
+        Route::get('announcements', [AnnouncementController::class, 'index']);
+        Route::get('announcements/{announcement}', [AnnouncementController::class, 'show']);
     });
 
     // Meetings: admin, organizer, teacher

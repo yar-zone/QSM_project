@@ -5,9 +5,8 @@ import { useState } from "react"
 import { z } from "zod"
 import { Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
-import { useQuery } from "@tanstack/react-query"
 
-import { parentApi, studentApi } from "@/services/api"
+import { parentApi } from "@/services/api"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -24,7 +23,6 @@ const schema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"),
   password_confirmation: z.string().min(1, "Confirm your password"),
   phone: z.string().trim().max(30).optional().or(z.literal("")),
-  student_ids: z.array(z.number()).optional(),
 }).refine((data) => data.password === data.password_confirmation, {
   message: "Passwords do not match",
   path: ["password_confirmation"],
@@ -35,26 +33,14 @@ type Values = z.infer<typeof schema>
 function NewParentPage() {
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
-  const [selectedStudents, setSelectedStudents] = useState<number[]>([])
-
-  const { data: students } = useQuery({
-    queryKey: ["students"],
-    queryFn: () => studentApi.list(),
-  })
 
   const { register, handleSubmit, formState: { errors } } = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "", email: "", password: "", password_confirmation: "",
-      phone: "", student_ids: [],
+      phone: "",
     },
   })
-
-  const toggleStudent = (id: number) => {
-    setSelectedStudents((prev) =>
-      prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]
-    )
-  }
 
   const onSubmit = async (values: Values) => {
     setSaving(true)
@@ -66,7 +52,6 @@ function NewParentPage() {
         password_confirmation: values.password_confirmation,
         role: "parent",
         phone: values.phone || undefined,
-        student_ids: selectedStudents,
       })
       toast.success("تم إنشاء ولي الأمر")
       navigate({ to: "/parents" })
@@ -116,26 +101,6 @@ function NewParentPage() {
             <div className="space-y-1.5">
               <Label htmlFor="phone">الهاتف</Label>
               <Input id="phone" type="tel" {...register("phone")} />
-            </div>
-            <div className="space-y-1.5">
-              <Label>الطلاب المرتبطون</Label>
-              {students && students.length > 0 ? (
-                <div className="max-h-48 overflow-y-auto rounded-md border p-2 space-y-1">
-                  {students.map((s) => (
-                    <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted rounded px-1 py-0.5">
-                      <input
-                        type="checkbox"
-                        checked={selectedStudents.includes(s.id)}
-                        onChange={() => toggleStudent(s.id)}
-                        className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                      />
-                      {s.user?.name ?? `Student #${s.id}`}
-                    </label>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">لا يوجد طلاب متاحون.</p>
-              )}
             </div>
             <Button type="submit" disabled={saving}>
               {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}

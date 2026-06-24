@@ -7,14 +7,15 @@ import { Loader2, ArrowLeft } from "lucide-react"
 import { toast } from "sonner"
 import { useQuery } from "@tanstack/react-query"
 
-import { studentApi, classApi } from "@/services/api"
-import type { Classe } from "@/types"
+import { studentApi, classApi, parentApi } from "@/services/api"
+import type { Classe, User } from "@/types"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export const Route = createFileRoute("/_authenticated/students/new")({
   component: NewStudentPage,
@@ -57,6 +58,13 @@ function NewStudentPage() {
     queryFn: () => classApi.list(),
   })
 
+  const { data: parents } = useQuery({
+    queryKey: ["parents"],
+    queryFn: () => parentApi.list(),
+  })
+
+  const [guardianId, setGuardianId] = useState<string>("")
+
   const selectedClasses = watch("class_ids") || []
 
   const onSubmit = async (values: Values) => {
@@ -75,6 +83,7 @@ function NewStudentPage() {
         emergency_contact: values.emergency_contact || undefined,
         enrollment_date: values.enrollment_date || undefined,
         class_ids: values.class_ids || undefined,
+        guardian_id: guardianId ? Number(guardianId) : undefined,
       })
       toast.success("تم إنشاء الطالب")
       navigate({ to: "/students" })
@@ -145,6 +154,17 @@ function NewStudentPage() {
                   </div>
                 ))}
               </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="guardian">ولي الأمر</Label>
+              <Select value={guardianId} onValueChange={setGuardianId}>
+                <SelectTrigger><SelectValue placeholder="اختر ولي أمر (اختياري)" /></SelectTrigger>
+                <SelectContent>
+                  {(parents ?? []).map((p: User) => (
+                    <SelectItem key={p.id} value={String(p.id)}>{p.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="date_of_birth">تاريخ الميلاد</Label>

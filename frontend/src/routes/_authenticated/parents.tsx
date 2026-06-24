@@ -4,7 +4,7 @@ import { Plus, Inbox, Trash2, Pencil, Search, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useState, useMemo } from "react"
 
-import { parentApi, studentApi } from "@/services/api"
+import { parentApi } from "@/services/api"
 import type { User } from "@/types"
 import { useAuth } from "@/hooks/use-auth"
 import { PageHeader } from "@/components/dashboard/page-header"
@@ -32,12 +32,6 @@ function ParentsPage() {
   const [editName, setEditName] = useState("")
   const [editEmail, setEditEmail] = useState("")
   const [editPhone, setEditPhone] = useState("")
-  const [editStudents, setEditStudents] = useState<number[]>([])
-
-  const { data: students } = useQuery({
-    queryKey: ["students"],
-    queryFn: () => studentApi.list(),
-  })
 
   const { data, isLoading } = useQuery({
     queryKey: ["parents"],
@@ -81,12 +75,7 @@ function ParentsPage() {
     setEditName(parent.name ?? "")
     setEditEmail(parent.email ?? "")
     setEditPhone(parent.phone ?? "")
-    setEditStudents((parent as any).parentStudents?.map((s: any) => s.id) ?? [])
     setEditId(parent.id)
-  }
-
-  function toggleEditStudent(id: number) {
-    setEditStudents(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
   }
 
   if (isChildRoute) return <Outlet />
@@ -187,29 +176,11 @@ function ParentsPage() {
                                 <Label>الهاتف</Label>
                                 <Input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
                               </div>
-                              <div className="space-y-1.5">
-                                <Label>الطلاب المرتبطون</Label>
-                                {students && students.length > 0 ? (
-                                  <div className="max-h-48 overflow-y-auto rounded-md border p-2 space-y-1">
-                                    {students.map((s) => {
-                                      const checked = editStudents.includes(s.id)
-                                      return (
-                                        <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted rounded px-1 py-0.5">
-                                          <input type="checkbox" checked={checked} onChange={() => toggleEditStudent(s.id)} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
-                                          {s.user?.name ?? `طالب #${s.id}`}
-                                        </label>
-                                      )
-                                    })}
-                                  </div>
-                                ) : (
-                                  <p className="text-sm text-muted-foreground">لا يوجد طلاب متاحون.</p>
-                                )}
-                              </div>
                             </div>
                             <DialogFooter>
                               <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
                               <Button
-                                onClick={() => updateMutation.mutate({ id: parent.id, data: { name: editName, email: editEmail, phone: editPhone || undefined, student_ids: editStudents } })}
+                                onClick={() => updateMutation.mutate({ id: parent.id, data: { name: editName, email: editEmail, phone: editPhone || undefined } })}
                                 disabled={updateMutation.isPending}
                               >
                                 {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Student;
 use App\Models\StudentParent;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -72,6 +73,7 @@ class ParentController extends Controller
                     'student_id' => $studentId,
                     'parent_id' => $user->id,
                 ]);
+                Student::where('id', $studentId)->update(['guardian_id' => $user->id]);
             }
         }
 
@@ -135,12 +137,24 @@ class ParentController extends Controller
         $parent->update($data);
 
         if ($request->has('student_ids')) {
+            $newIds = $request->student_ids ?? [];
+            $oldIds = StudentParent::where('parent_id', $parent->id)->pluck('student_id')->toArray();
+
+            // Remove guardian for unassigned children
+            $removedIds = array_diff($oldIds, $newIds);
+            if (!empty($removedIds)) {
+                Student::whereIn('id', $removedIds)
+                    ->where('guardian_id', $parent->id)
+                    ->update(['guardian_id' => null]);
+            }
+
             StudentParent::where('parent_id', $parent->id)->delete();
-            foreach ($request->student_ids as $studentId) {
+            foreach ($newIds as $studentId) {
                 StudentParent::create([
                     'student_id' => $studentId,
                     'parent_id' => $parent->id,
                 ]);
+                Student::where('id', $studentId)->update(['guardian_id' => $parent->id]);
             }
         }
 
@@ -160,6 +174,7 @@ class ParentController extends Controller
         }
 
         $parent = User::where('role', 'parent')->findOrFail($id);
+        Student::where('guardian_id', $parent->id)->update(['guardian_id' => null]);
         StudentParent::where('parent_id', $parent->id)->delete();
         $parent->delete();
 

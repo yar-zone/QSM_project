@@ -62,6 +62,7 @@ class StudentController extends Controller
             'emergency_contact' => 'nullable|string|max:20',
             'class_ids' => 'nullable|array',
             'class_ids.*' => 'exists:classes,id',
+            'guardian_id' => 'nullable|exists:users,id',
         ]);
 
         $user = User::create([
@@ -79,6 +80,7 @@ class StudentController extends Controller
             'address' => $request->address,
             'phone' => $request->phone,
             'emergency_contact' => $request->emergency_contact,
+            'guardian_id' => $request->guardian_id,
         ]);
 
         if ($request->has('class_ids')) {
@@ -137,6 +139,7 @@ class StudentController extends Controller
             'is_active' => 'nullable|boolean',
             'class_ids' => 'nullable|array',
             'class_ids.*' => 'exists:classes,id',
+            'guardian_id' => 'nullable|exists:users,id',
         ]);
 
         $userData = [];
@@ -151,6 +154,7 @@ class StudentController extends Controller
         $student->update($request->only([
             'enrollment_date', 'date_of_birth',
             'gender', 'address', 'phone', 'emergency_contact', 'is_active',
+            'guardian_id',
         ]));
 
         if ($request->has('class_ids')) {

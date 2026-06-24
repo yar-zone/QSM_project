@@ -1,147 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html dir="rtl">
 <head>
     <meta charset="utf-8">
-    <title>Certificate of Achievement</title>
+    <title>شهادة تقدير</title>
     <style>
-        @page { margin: 0; }
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: dejavusans;
             margin: 0;
             padding: 0;
-            background: #f5f0e8;
+            background: #f0f4f8;
         }
-        .certificate-wrapper {
-            width: 100%;
-            height: 100%;
-            padding: 40px;
-            box-sizing: border-box;
-        }
-        .certificate-border {
-            border: 4px double #007979;
-            padding: 30px;
+        .outer {
+            border: 3pt solid #0D9488;
+            margin: 10pt;
+            padding: 8pt;
             background: white;
-            min-height: 600px;
-            position: relative;
         }
-        .header {
+        .inner {
+            border: 1pt solid #cbd5e1;
+            padding: 15pt 20pt;
+            background: white;
+        }
+        .top-bar {
+            height: 4pt;
+            background: #0D9488;
+            margin-bottom: 15pt;
+        }
+        .bottom-bar {
+            height: 4pt;
+            background: #0D9488;
+            margin-top: 15pt;
+        }
+        .center {
             text-align: center;
-            border-bottom: 2px solid #007979;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
         }
-        .header h1 {
-            color: #007979;
-            font-size: 28px;
-            margin: 0 0 5px;
-        }
-        .header h2 {
-            color: #2D3A3A;
-            font-size: 16px;
-            margin: 0;
-            font-weight: normal;
-        }
-        .title {
-            text-align: center;
-            margin: 30px 0;
-        }
-        .title h3 {
-            font-size: 14px;
-            color: #6B7A7A;
-            margin: 0 0 10px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-        .title h4 {
-            font-size: 26px;
-            color: #2D3A3A;
-            margin: 0;
-        }
-        .student-name {
-            text-align: center;
-            font-size: 32px;
-            color: #007979;
+        .school {
+            font-size: 22pt;
             font-weight: bold;
-            margin: 20px 0;
-            padding: 15px;
-            border-top: 2px solid #007979;
-            border-bottom: 2px solid #007979;
+            color: #0F172A;
+        }
+        .sub {
+            font-size: 11pt;
+            color: #64748b;
+        }
+        .divider {
+            width: 50%;
+            height: 1pt;
+            background: #0D9488;
+            margin: 8pt auto;
+        }
+        .label {
+            font-size: 11pt;
+            color: #64748b;
+        }
+        .badge {
+            background: #0D9488;
+            color: white;
+            padding: 3pt 12pt;
+            font-size: 14pt;
+            font-weight: bold;
+            display: inline-block;
+        }
+        .body-text {
+            font-size: 13pt;
+            color: #475569;
+            line-height: 2;
+        }
+        .student {
+            font-size: 28pt;
+            font-weight: bold;
+            color: #0F172A;
+            padding: 6pt 0;
+        }
+        .student-line {
+            width: 35%;
+            height: 1.5pt;
+            background: #0D9488;
+            margin: 0 auto;
         }
         .details {
-            text-align: center;
-            font-size: 14px;
-            color: #2D3A3A;
-            line-height: 2;
-            margin: 25px 0;
+            font-size: 13pt;
+            color: #475569;
+            line-height: 2.2;
         }
         .details strong {
-            color: #007979;
+            color: #0D9488;
         }
-        .footer {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            right: 30px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: #6B7A7A;
-            border-top: 1px solid #D4C9B8;
-            padding-top: 15px;
+        .info-table {
+            width: 100%;
+            border-top: 1pt solid #e2e8f0;
+            padding-top: 10pt;
         }
-        .qr-code {
+        .info-table td {
+            width: 33%;
             text-align: center;
-            margin: 20px 0;
+            font-size: 10pt;
         }
-        .certificate-number {
-            font-size: 11px;
-            color: #6B7A7A;
-            text-align: center;
-            margin-top: 10px;
+        .info-label {
+            color: #94a3b8;
         }
+        .info-value {
+            font-weight: bold;
+            color: #0F172A;
+        }
+        .verified { color: #0D9488; }
+        .pending { color: #f59e0b; }
     </style>
 </head>
 <body>
-    <div class="certificate-wrapper">
-        <div class="certificate-border">
-            <div class="header">
-                <h1>Nur Quranic School</h1>
-                <h2>Certificate of Quran Memorization</h2>
+    <div class="outer">
+        <div class="inner">
+            <div class="top-bar"></div>
+
+            <div class="center">
+                <div class="school">مدرسة نور القرآن</div>
+                <div class="sub">Nur Quranic School</div>
+                <div class="divider"></div>
+
+                <div class="label">شهادة تقدير</div>
+                <div class="badge">{{ $certificate_type }}</div>
+
+                <div class="body-text">يشهد المعهد بأن</div>
+                <div class="student">{{ $student_name }}</div>
+                <div class="student-line"></div>
             </div>
 
-            <div class="title">
-                <h3>This is to certify that</h3>
+            <div class="center details">
+                قد أتم بنجاح حفظ <strong>{{ $hizb_count }}</strong> حزباً من القرآن الكريم<br>
+                وحصل على تقدير <strong>{{ $grade }}</strong><br>
+                في تاريخ <strong>{{ \Carbon\Carbon::parse($issued_date)->format('Y/m/d') }}</strong>
             </div>
 
-            <div class="student-name">
-                {{ $student_name }}
-            </div>
+            <table class="info-table">
+                <tr>
+                    <td>
+                        <div class="info-label">رقم الشهادة</div>
+                        <div class="info-value">{{ $certificate_number }}</div>
+                    </td>
+                    <td>
+                        <div class="info-label">تاريخ الإصدار</div>
+                        <div class="info-value">{{ \Carbon\Carbon::parse($issued_date)->format('Y/m/d') }}</div>
+                    </td>
+                    <td>
+                        <div class="info-label">الحالة</div>
+                        <div class="info-value {{ $is_verified ? 'verified' : 'pending' }}">
+                            {{ $is_verified ? 'موثقة' : 'قيد التحقق' }}
+                        </div>
+                    </td>
+                </tr>
+            </table>
 
-            <div class="details">
-                has successfully memorized <strong>{{ $hizb_count }} hizb(s)</strong> of the Holy Quran<br>
-                and has been awarded a grade of <strong>{{ $grade ?? 'N/A' }}</strong><br>
-                on this day, <strong>{{ \Carbon\Carbon::parse($issued_date)->format('F j, Y') }}</strong>
-            </div>
-
-            @if($qr_code)
-            <div class="qr-code">
-                <img src="{{ $qr_code }}" alt="QR Code" width="80" height="80">
-            </div>
-            @endif
-
-            <div class="certificate-number">
-                Certificate No: {{ $certificate_number }}
-            </div>
-
-            <div class="footer">
-                <div>
-                    <strong>Issued by:</strong> Nur Quranic School<br>
-                    <strong>Certificate Type:</strong> {{ ucfirst($certificate_type) }}
-                </div>
-                <div>
-                    <strong>Status:</strong> {{ $is_verified ? 'Verified' : 'Pending Verification' }}
-                </div>
-            </div>
+            <div class="bottom-bar"></div>
         </div>
     </div>
 </body>

@@ -34,10 +34,8 @@ class MeetingController extends Controller
         }
 
         $user = $request->user();
-        if ($user->role === 'admin') {
-            // Admin sees all meetings
-        } elseif ($user->role === 'organizer') {
-            $query->where('organizer_id', $user->id);
+        if ($user->role === 'admin' || $user->role === 'organizer') {
+            // Admin and organizer see all meetings
         } elseif ($user->role === 'teacher' && $user->teacher) {
             $query->where(function ($q) use ($user) {
                 $q->where('teacher_id', $user->teacher->id)
