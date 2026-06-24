@@ -143,11 +143,10 @@ function RegisterForm() {
         <div className="grid grid-cols-3 gap-2">
           {(["teacher", "student", "parent"] as const).map(r => (
             <button key={r} type="button" onClick={() => setRole(r)}
-              className={`rounded-lg border px-3 py-2 text-center text-sm font-medium transition-all ${
-                role === r
+              className={`rounded-lg border px-3 py-2 text-center text-sm font-medium transition-all ${role === r
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
                   : "border-border bg-background text-foreground hover:bg-accent"
-              }`}>
+                }`}>
               {{ teacher: "معلم", student: "طالب", parent: "ولي أمر" }[r]}
             </button>
           ))}
@@ -162,7 +161,7 @@ function RegisterForm() {
         <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" placeholder="بريدك@example.com" />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="phone">الهاتف (اختياري)</Label>
+        <Label htmlFor="phone">الهاتف</Label>
         <Input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="05XX XXX XXXX" />
       </div>
       <div className="space-y-1.5">
