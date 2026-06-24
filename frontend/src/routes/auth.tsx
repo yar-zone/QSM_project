@@ -199,6 +199,7 @@ function RegisterForm() {
         <div className="text-center">
           <p className="text-sm text-muted-foreground">أدخل كود التحقق المكون من 6 أرقام</p>
           <p className="text-xs text-muted-foreground mt-1" dir="ltr">{email}</p>
+          <p className="text-xs text-amber-600 mt-2">قد تجد البريد في مجلد الرسائل غير المرغوب فيها (Spam).</p>
         </div>
         <div className="flex justify-center">
           <Input
