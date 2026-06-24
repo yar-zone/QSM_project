@@ -1,7 +1,7 @@
 import {
   LayoutDashboard, UserCheck, User, Users, GraduationCap, BookOpen,
   LayoutList, BookMarked, ClipboardList, Award, Bell,
-  Video, CalendarCheck, FileText, Shield, type LucideIcon,
+  Video, CalendarCheck, FileText, Shield, UserCog, type LucideIcon,
 } from "lucide-react"
 
 import type { AppRole } from "@/lib/roles"
@@ -27,8 +27,8 @@ export const NAV_ITEMS: NavItem[] = [
   { title: "الحضور", to: "/attendance", icon: CalendarCheck, roles: ["admin", "organizer", "teacher", "student", "parent"] },
   { title: "الشهادات", to: "/certificates", icon: Award, roles: ["admin", "organizer", "teacher", "student", "parent"] },
   { title: "الإعلانات", to: "/announcements", icon: Bell, roles: ["admin", "organizer", "teacher", "student", "parent"] },
-  { title: "الاجتماعات", to: "/meetings", icon: Video, roles: ["admin", "organizer", "teacher"] },
   { title: "المستخدمون", to: "/users", icon: Shield, roles: ["admin"] },
+  { title: "المنظمون", to: "/organizers", icon: UserCog, roles: ["admin"] },
   { title: "ملفي الشخصي", to: "/profile", icon: User, roles: ["admin", "organizer", "teacher", "student", "parent"] },
 ]
 

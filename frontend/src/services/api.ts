@@ -36,6 +36,7 @@ export const authApi = {
   register: (data: RegisterData) => api.post<AuthResponse>('/auth/register', data).then(r => ({ ...r.data, user: r.data.data.user, token: r.data.data.token })),
   me: () => api.get<ApiResponse<User>>('/auth/me').then(r => r.data.data),
   logout: () => api.post('/auth/logout'),
+  changePassword: (data: { current_password: string; new_password: string; new_password_confirmation: string }) => api.post('/auth/change-password', data).then(r => r.data),
 }
 
 export const dashboardApi = {
@@ -49,6 +50,8 @@ export const userApi = {
   deactivate: (id: number) => api.post<ApiResponse<User>>(`/users/${id}/deactivate`).then(r => r.data.data),
   reactivate: (id: number) => api.post<ApiResponse<User>>(`/users/${id}/reactivate`).then(r => r.data.data),
   list: () => api.get('/users').then(r => extractArray<User>(r.data.data)),
+  update: (id: number, data: Record<string, unknown>) => api.put<ApiResponse<User>>(`/users/${id}`, data).then(r => r.data.data),
+  resetPassword: (id: number, data: { password: string; password_confirmation: string }) => api.post(`/users/${id}/reset-password`, data).then(r => r.data),
 }
 
 export const studentApi = {
@@ -120,6 +123,7 @@ export const surahApi = {
 
 export const memorizationApi = {
   list: (params?: Record<string, string>) => api.get('/memorization-trackings', { params }).then(r => extractArray<MemorizationTracking>(r.data.data)),
+  myList: () => api.get('/memorization-trackings/my').then(r => extractArray<MemorizationTracking>(r.data.data)),
   get: (id: number) => api.get<ApiResponse<MemorizationTracking>>(`/memorization-trackings/${id}`).then(r => r.data.data),
   create: (data: Partial<MemorizationTracking>) => api.post<ApiResponse<MemorizationTracking>>('/memorization-trackings', data).then(r => r.data.data),
   update: (id: number, data: Partial<MemorizationTracking>) => api.put<ApiResponse<MemorizationTracking>>(`/memorization-trackings/${id}`, data).then(r => r.data.data),
@@ -135,6 +139,7 @@ export const examRequestApi = {
 
 export const examResultApi = {
   list: (params?: Record<string, string>) => api.get('/exam-results', { params }).then(r => extractArray<ExamResult>(r.data.data)),
+  myList: () => api.get('/exam-results/my').then(r => extractArray<ExamResult>(r.data.data)),
   get: (id: number) => api.get<ApiResponse<ExamResult>>(`/exam-results/${id}`).then(r => r.data.data),
   create: (data: Partial<ExamResult>) => api.post<ApiResponse<ExamResult>>('/exam-results', data).then(r => r.data.data),
   update: (id: number, data: Partial<ExamResult>) => api.put<ApiResponse<ExamResult>>(`/exam-results/${id}`, data).then(r => r.data.data),
@@ -143,6 +148,7 @@ export const examResultApi = {
 
 export const certificateApi = {
   list: (params?: Record<string, string>) => api.get('/certificates', { params }).then(r => extractArray<Certificate>(r.data.data)),
+  myList: () => api.get('/certificates/my').then(r => extractArray<Certificate>(r.data.data)),
   get: (id: number) => api.get<ApiResponse<Certificate>>(`/certificates/${id}`).then(r => r.data.data),
   create: (data: Partial<Certificate>) => api.post<ApiResponse<Certificate>>('/certificates', data).then(r => r.data.data),
   update: (id: number, data: Partial<Certificate>) => api.put<ApiResponse<Certificate>>(`/certificates/${id}`, data).then(r => r.data.data),
@@ -170,6 +176,7 @@ export const meetingApi = {
 
 export const attendanceApi = {
   list: (params?: Record<string, string>) => api.get('/attendances', { params }).then(r => extractArray<Attendance>(r.data.data)),
+  myList: () => api.get('/attendances/my').then(r => extractArray<Attendance>(r.data.data)),
   get: (id: number) => api.get<ApiResponse<Attendance>>(`/attendances/${id}`).then(r => r.data.data),
   create: (data: Partial<Attendance>) => api.post<ApiResponse<Attendance>>('/attendances', data).then(r => r.data.data),
   update: (id: number, data: Partial<Attendance>) => api.put<ApiResponse<Attendance>>(`/attendances/${id}`, data).then(r => r.data.data),

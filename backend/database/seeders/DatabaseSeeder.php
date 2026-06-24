@@ -10,7 +10,6 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,7 +18,7 @@ class DatabaseSeeder extends Seeder
         $admin = User::create([
             'name' => 'Admin',
             'email' => 'admin@qsm.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'role' => 'admin',
             'status' => 'active',
         ]);
@@ -27,7 +26,7 @@ class DatabaseSeeder extends Seeder
         $organizerUser = User::create([
             'name' => 'Organizer',
             'email' => 'organizer@qsm.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'role' => 'organizer',
             'status' => 'active',
         ]);
@@ -41,7 +40,7 @@ class DatabaseSeeder extends Seeder
         $teacherUser = User::create([
             'name' => 'Teacher',
             'email' => 'teacher@qsm.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'role' => 'teacher',
             'status' => 'active',
         ]);
@@ -56,7 +55,7 @@ class DatabaseSeeder extends Seeder
         $studentUser = User::create([
             'name' => 'Student',
             'email' => 'student@qsm.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
             'role' => 'student',
             'status' => 'active',
         ]);
@@ -68,6 +67,14 @@ class DatabaseSeeder extends Seeder
             'gender' => 'male',
             'address' => '123 Main St',
             'phone' => '0987654321',
+        ]);
+
+        User::create([
+            'name' => 'Parent',
+            'email' => 'parent@qsm.com',
+            'password' => 'password',
+            'role' => 'parent',
+            'status' => 'active',
         ]);
 
         $level1 = Level::create(['name' => 'Beginner', 'description' => 'Basic Quran reading', 'order' => 1]);

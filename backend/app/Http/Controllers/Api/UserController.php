@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -35,6 +36,42 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'data' => $users,
+        ]);
+    }
+
+    public function update(Request $request, User $user): JsonResponse
+    {
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'phone' => 'nullable|string|max:30',
+        ]);
+
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+        if ($request->has('phone')) {
+            $user->phone = $request->phone;
+        }
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => $user,
+            'message' => 'User updated successfully.',
+        ]);
+    }
+
+    public function resetPassword(Request $request, User $user): JsonResponse
+    {
+        $request->validate([
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user->update(['password' => $request->password]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إعادة تعيين كلمة المرور بنجاح.',
         ]);
     }
 

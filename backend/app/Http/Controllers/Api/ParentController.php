@@ -60,7 +60,7 @@ class ParentController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'role' => 'parent',
             'status' => 'active',
             'phone' => $request->phone,
@@ -129,7 +129,7 @@ class ParentController extends Controller
         $data = [];
         if ($request->has('name')) $data['name'] = $request->name;
         if ($request->has('email')) $data['email'] = $request->email;
-        if ($request->has('password')) $data['password'] = Hash::make($request->password);
+        if ($request->has('password')) $data['password'] = $request->password;
         if ($request->has('phone')) $data['phone'] = $request->phone;
 
         $parent->update($data);

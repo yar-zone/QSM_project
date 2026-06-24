@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { ROLE_LABELS } from "@/lib/roles"
 import { Badge } from "@/components/ui/badge"
-import { userApi } from "@/services/api"
+import { userApi, authApi } from "@/services/api"
 
 export const Route = createFileRoute("/_authenticated/profile")({
   component: ProfilePage,
@@ -26,13 +26,29 @@ const schema = z.object({
 })
 type Values = z.infer<typeof schema>
 
+const passwordSchema = z.object({
+  current_password: z.string().min(1, "Current password is required"),
+  new_password: z.string().min(8, "Password must be at least 8 characters"),
+  new_password_confirmation: z.string().min(1, "Confirm your new password"),
+}).refine(data => data.new_password === data.new_password_confirmation, {
+  message: "Passwords do not match",
+  path: ["new_password_confirmation"],
+})
+type PasswordValues = z.infer<typeof passwordSchema>
+
 function ProfilePage() {
   const { user, primaryRole, refresh } = useAuth()
   const [saving, setSaving] = useState(false)
+  const [savingPassword, setSavingPassword] = useState(false)
 
   const { register, handleSubmit, formState: { errors } } = useForm<Values>({
     resolver: zodResolver(schema),
     values: { name: user?.name ?? "", phone: user?.phone ?? "" },
+  })
+
+  const { register: registerPw, handleSubmit: handleSubmitPw, formState: { errors: errorsPw }, reset: resetPw, watch: watchPw } = useForm<PasswordValues>({
+    resolver: zodResolver(passwordSchema),
+    defaultValues: { current_password: "", new_password: "", new_password_confirmation: "" },
   })
 
   const onSubmit = async (values: Values) => {
@@ -46,6 +62,19 @@ function ProfilePage() {
       toast.error(err?.response?.data?.message || "فشل التحديث")
     } finally {
       setSaving(false)
+    }
+  }
+
+  const onSubmitPassword = async (values: PasswordValues) => {
+    setSavingPassword(true)
+    try {
+      await authApi.changePassword(values)
+      toast.success("تم تغيير كلمة المرور بنجاح")
+      resetPw()
+    } catch (err: any) {
+      toast.error(err?.response?.data?.message || "فشل تغيير كلمة المرور")
+    } finally {
+      setSavingPassword(false)
     }
   }
 
@@ -77,6 +106,35 @@ function ProfilePage() {
             <Button type="submit" disabled={saving}>
               {saving && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
               حفظ التغييرات
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-[var(--shadow-card)] mt-6">
+        <CardHeader>
+          <CardTitle>تغيير كلمة المرور</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmitPw(onSubmitPassword)} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="current_password">كلمة المرور الحالية</Label>
+              <Input id="current_password" type="password" {...registerPw("current_password")} />
+              {errorsPw.current_password && <p className="text-xs text-destructive">{errorsPw.current_password.message}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="new_password">كلمة المرور الجديدة</Label>
+              <Input id="new_password" type="password" {...registerPw("new_password")} />
+              {errorsPw.new_password && <p className="text-xs text-destructive">{errorsPw.new_password.message}</p>}
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="new_password_confirmation">تأكيد كلمة المرور الجديدة</Label>
+              <Input id="new_password_confirmation" type="password" {...registerPw("new_password_confirmation")} />
+              {errorsPw.new_password_confirmation && <p className="text-xs text-destructive">{errorsPw.new_password_confirmation.message}</p>}
+            </div>
+            <Button type="submit" disabled={savingPassword}>
+              {savingPassword && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+              تغيير كلمة المرور
             </Button>
           </form>
         </CardContent>

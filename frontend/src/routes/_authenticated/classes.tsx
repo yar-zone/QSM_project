@@ -6,7 +6,7 @@ import { useState, useMemo } from "react"
 
 import { useAuth } from "@/hooks/use-auth"
 
-import { classApi } from "@/services/api"
+import { classApi, levelApi, teacherApi } from "@/services/api"
 import type { Classe } from "@/types"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Card, CardContent } from "@/components/ui/card"
@@ -14,6 +14,9 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/classes")({
@@ -28,10 +31,25 @@ function ClassesPage() {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [editName, setEditName] = useState("")
+  const [editLevelId, setEditLevelId] = useState("")
+  const [editTeacherId, setEditTeacherId] = useState("")
+  const [editAcademicYear, setEditAcademicYear] = useState("")
+  const [editMaxStudents, setEditMaxStudents] = useState("")
+  const [editDescription, setEditDescription] = useState("")
 
   const { data: classes, isLoading } = useQuery({
     queryKey: ["classes"],
     queryFn: classApi.list,
+  })
+  const { data: levels } = useQuery({
+    queryKey: ["levels"],
+    queryFn: levelApi.list,
+  })
+  const { data: teachers } = useQuery({
+    queryKey: ["teachers"],
+    queryFn: teacherApi.list,
   })
 
   const classesList = classes ?? []
@@ -53,6 +71,28 @@ function ClassesPage() {
     },
     onError: () => toast.error("فشل حذف الفصل"),
   })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Record<string, unknown> }) => classApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["classes"] })
+      toast.success("تم تحديث الفصل")
+      setEditId(null)
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "فشل تحديث الفصل")
+    },
+  })
+
+  function openEdit(c: Classe) {
+    setEditName(c.name)
+    setEditLevelId(String(c.level_id))
+    setEditTeacherId(String(c.teacher_id))
+    setEditAcademicYear(c.academic_year ?? "")
+    setEditMaxStudents(c.max_students ? String(c.max_students) : "")
+    setEditDescription(c.description ?? "")
+    setEditId(c.id)
+  }
 
   if (isChildRoute) return <Outlet />
 
@@ -120,11 +160,70 @@ function ClassesPage() {
                     {canManage && (
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
-                          <a href={`/classes/${c.id}/edit`}>
-                            <Button variant="ghost" size="icon">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </a>
+                          <Dialog open={editId === c.id} onOpenChange={(open) => { if (!open) setEditId(null); }}>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-lg">
+                              <DialogHeader><DialogTitle>تعديل الفصل</DialogTitle></DialogHeader>
+                              <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto">
+                                <div className="space-y-1.5">
+                                  <Label>الاسم</Label>
+                                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>المستوى</Label>
+                                  <Select onValueChange={setEditLevelId} value={editLevelId}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="اختر مستوى" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {(levels ?? []).map((l) => (
+                                        <SelectItem key={l.id} value={String(l.id)}>{l.name}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>المعلم</Label>
+                                  <Select onValueChange={setEditTeacherId} value={editTeacherId}>
+                                    <SelectTrigger>
+                                      <SelectValue placeholder="اختر معلماً" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {(teachers ?? []).map((t: any) => (
+                                        <SelectItem key={t.id} value={String(t.id)}>{t.user?.name ?? `معلم #${t.id}`}</SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>السنة الدراسية</Label>
+                                  <Input value={editAcademicYear} onChange={(e) => setEditAcademicYear(e.target.value)} placeholder="مثال: 2025-2026" />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>الحد الأقصى للطلاب</Label>
+                                  <Input type="number" value={editMaxStudents} onChange={(e) => setEditMaxStudents(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>الوصف</Label>
+                                  <Textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
+                                <Button
+                                  onClick={() => updateMutation.mutate({ id: c.id, data: { name: editName, level_id: Number(editLevelId), teacher_id: Number(editTeacherId), academic_year: editAcademicYear || undefined, max_students: editMaxStudents ? Number(editMaxStudents) : undefined, description: editDescription || undefined } })}
+                                  disabled={updateMutation.isPending}
+                                >
+                                  {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                  حفظ
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           <Dialog open={deleteId === c.id} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
                             <DialogTrigger asChild>
                               <Button variant="ghost" size="icon" onClick={() => setDeleteId(c.id)}>

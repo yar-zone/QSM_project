@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { Users, GraduationCap, UserCog, Clock, UserCheck, BookOpen, TrendingUp, CheckCircle2, XCircle, ShieldCheck } from "lucide-react"
-import { useState, useMemo } from "react"
+import { useState } from "react"
 
 import { dashboardApi, userApi, attendanceApi } from "@/services/api"
 import type { AttendanceClassReport } from "@/types"
@@ -37,16 +37,14 @@ const STATUS_COLORS: Record<string, string> = {
 export function StaffDashboard({ isAdmin }: { isAdmin: boolean }) {
   const [rangeDays, setRangeDays] = useState(365)
 
-  const dateParams = useMemo(() => {
-    const date_to = new Date().toISOString().slice(0, 10)
-    const from = new Date()
-    from.setDate(from.getDate() - rangeDays)
-    return { date_from: from.toISOString().slice(0, 10), date_to }
-  }, [rangeDays])
-
   const { data: stats, isLoading } = useQuery({
-    queryKey: ["dashboard-stats", dateParams],
-    queryFn: () => dashboardApi.get(dateParams),
+    queryKey: ["dashboard-stats", rangeDays],
+    queryFn: () => {
+      const date_to = new Date().toISOString().slice(0, 10)
+      const from = new Date()
+      from.setDate(from.getDate() - rangeDays + 1)
+      return dashboardApi.get({ date_from: from.toISOString().slice(0, 10), date_to })
+    },
   })
 
   const { data: pendingUsers } = useQuery({
@@ -55,13 +53,23 @@ export function StaffDashboard({ isAdmin }: { isAdmin: boolean }) {
   })
 
   const { data: report } = useQuery({
-    queryKey: ["attendance-report", dateParams],
-    queryFn: () => attendanceApi.reports(dateParams),
+    queryKey: ["attendance-report", rangeDays],
+    queryFn: () => {
+      const date_to = new Date().toISOString().slice(0, 10)
+      const from = new Date()
+      from.setDate(from.getDate() - rangeDays + 1)
+      return attendanceApi.reports({ date_from: from.toISOString().slice(0, 10), date_to })
+    },
   })
 
   const { data: classReports } = useQuery({
-    queryKey: ["attendance-class-reports", dateParams],
-    queryFn: () => attendanceApi.classReports(dateParams),
+    queryKey: ["attendance-class-reports", rangeDays],
+    queryFn: () => {
+      const date_to = new Date().toISOString().slice(0, 10)
+      const from = new Date()
+      from.setDate(from.getDate() - rangeDays + 1)
+      return attendanceApi.classReports({ date_from: from.toISOString().slice(0, 10), date_to })
+    },
   })
 
   const pendingCount = Array.isArray(pendingUsers) ? pendingUsers.length : 0

@@ -24,8 +24,9 @@ export const Route = createFileRoute("/_authenticated/memorizations")({
 })
 
 function MemorizationsPage() {
-  const { isAdmin, isOrganizer, isTeacher } = useAuth()
+  const { isAdmin, isOrganizer, isTeacher, isStudent, isParent } = useAuth()
   const canManage = isAdmin || isOrganizer || isTeacher
+  const isStudentOrParent = isStudent || isParent
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isChildRoute = pathname !== "/memorizations"
   const queryClient = useQueryClient()
@@ -35,8 +36,8 @@ function MemorizationsPage() {
   const [editForm, setEditForm] = useState({ verses_memorized: "", verses_revised: "", teacher_notes: "", revision_level: "", performance_score: "" })
 
   const { data: memorizations, isLoading } = useQuery({
-    queryKey: ["memorizations"],
-    queryFn: () => memorizationApi.list(),
+    queryKey: ["memorizations", isStudentOrParent ? "my" : "all"],
+    queryFn: () => isStudentOrParent ? memorizationApi.myList() : memorizationApi.list(),
   })
 
   const memorizationsList = memorizations ?? []
@@ -50,13 +51,13 @@ function MemorizationsPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => memorizationApi.delete(id),
-    onSuccess: () => { toast.success("تم حذف سجل الحفظ"); queryClient.invalidateQueries({ queryKey: ["memorizations"] }); setDeleteId(null) },
+    onSuccess: () => { toast.success("تم حذف سجل الحفظ"); queryClient.invalidateQueries({ queryKey: ["memorizations", "all"] }); queryClient.invalidateQueries({ queryKey: ["memorizations", "my"] }); setDeleteId(null) },
     onError: () => toast.error("فشل حذف السجل"),
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<MemorizationTracking> }) => memorizationApi.update(id, data),
-    onSuccess: () => { toast.success("تم تحديث سجل الحفظ"); queryClient.invalidateQueries({ queryKey: ["memorizations"] }); setEditId(null) },
+    onSuccess: () => { toast.success("تم تحديث سجل الحفظ"); queryClient.invalidateQueries({ queryKey: ["memorizations", "all"] }); queryClient.invalidateQueries({ queryKey: ["memorizations", "my"] }); setEditId(null) },
     onError: () => toast.error("فشل تحديث السجل"),
   })
 

@@ -62,7 +62,7 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'role' => $request->role,
             'status' => 'pending',
         ]);
@@ -95,6 +95,30 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'data' => $user,
+        ]);
+    }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'كلمة المرور الحالية غير صحيحة.',
+            ], 422);
+        }
+
+        $user->update(['password' => $request->new_password]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تغيير كلمة المرور بنجاح.',
         ]);
     }
 

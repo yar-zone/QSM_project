@@ -25,6 +25,21 @@ class ExamResultController extends Controller
             $query->where('student_id', $request->student_id);
         }
 
+        $user = $request->user();
+        if ($user->role === 'teacher') {
+            $teacher = $user->teacher;
+            if ($teacher) {
+                $classIds = $teacher->classes()->pluck('id');
+                $studentIds = \App\Models\Enrollment::whereIn('class_id', $classIds)->pluck('student_id');
+                $query->where(function ($q) use ($studentIds) {
+                    $q->whereIn('student_id', $studentIds)
+                      ->orWhereHas('examRequest', function ($q) use ($studentIds) {
+                          $q->whereIn('student_id', $studentIds);
+                      });
+                });
+            }
+        }
+
         $perPage = $request->get('per_page', 15);
         $results = $query->orderBy('created_at', 'desc')->paginate($perPage);
 
@@ -44,6 +59,18 @@ class ExamResultController extends Controller
             'evaluator_notes' => 'nullable|string',
             'is_passed' => 'nullable|boolean',
         ]);
+
+        $user = $request->user();
+        if ($user->role === 'teacher' && $request->has('student_id')) {
+            $teacher = $user->teacher;
+            if ($teacher) {
+                $classIds = $teacher->classes()->pluck('id');
+                $studentIds = \App\Models\Enrollment::whereIn('class_id', $classIds)->pluck('student_id');
+                if (!in_array((int)$request->student_id, $studentIds->toArray())) {
+                    return response()->json(['success' => false, 'message' => 'الطالب ليس ضمن فصولك.'], 403);
+                }
+            }
+        }
 
         $result = ExamResult::create([
             'student_id' => $request->student_id,

@@ -26,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/exam-results")({
 function ExamResultsPage() {
   const { isAdmin, isOrganizer, isTeacher, isStudent, isParent } = useAuth()
   const canManage = isAdmin || isOrganizer || isTeacher
+  const isStudentOrParent = isStudent || isParent
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isChildRoute = pathname !== "/exam-results"
   const queryClient = useQueryClient()
@@ -35,8 +36,8 @@ function ExamResultsPage() {
   const [editForm, setEditForm] = useState({ marks_obtained: "", grade: "", evaluator_notes: "", is_passed: false })
 
   const { data: results, isLoading } = useQuery({
-    queryKey: ["exam-results"],
-    queryFn: () => examResultApi.list(),
+    queryKey: ["exam-results", isStudentOrParent ? "my" : "all"],
+    queryFn: () => isStudentOrParent ? examResultApi.myList() : examResultApi.list(),
   })
 
   const resultsList = results ?? []
@@ -53,7 +54,7 @@ function ExamResultsPage() {
     mutationFn: (id: number) => examResultApi.delete(id),
     onSuccess: () => {
       toast.success("تم حذف نتيجة الامتحان")
-      queryClient.invalidateQueries({ queryKey: ["exam-results"] })
+      queryClient.invalidateQueries({ queryKey: ["exam-results", "all"] }); queryClient.invalidateQueries({ queryKey: ["exam-results", "my"] })
       setDeleteId(null)
     },
     onError: () => toast.error("فشل حذف نتيجة الامتحان"),
@@ -63,7 +64,7 @@ function ExamResultsPage() {
     mutationFn: ({ id, data }: { id: number; data: Partial<ExamResult> }) => examResultApi.update(id, data),
     onSuccess: () => {
       toast.success("تم تحديث نتيجة الامتحان")
-      queryClient.invalidateQueries({ queryKey: ["exam-results"] })
+      queryClient.invalidateQueries({ queryKey: ["exam-results", "all"] }); queryClient.invalidateQueries({ queryKey: ["exam-results", "my"] })
       setEditId(null)
     },
     onError: () => toast.error("فشل تحديث نتيجة الامتحان"),

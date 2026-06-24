@@ -14,6 +14,8 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/levels")({
@@ -28,6 +30,11 @@ function LevelsPage() {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [editName, setEditName] = useState("")
+  const [editDescription, setEditDescription] = useState("")
+  const [editOrder, setEditOrder] = useState("")
+  const [editIsActive, setEditIsActive] = useState(true)
 
   const { data: levels, isLoading } = useQuery({
     queryKey: ["levels"],
@@ -52,6 +59,26 @@ function LevelsPage() {
     },
     onError: () => toast.error("فشل حذف المستوى"),
   })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Record<string, unknown> }) => levelApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["levels"] })
+      toast.success("تم تحديث المستوى")
+      setEditId(null)
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "فشل تحديث المستوى")
+    },
+  })
+
+  function openEdit(l: Level) {
+    setEditName(l.name)
+    setEditDescription(l.description ?? "")
+    setEditOrder(String(l.order))
+    setEditIsActive(l.is_active)
+    setEditId(l.id)
+  }
 
   if (isChildRoute) return <Outlet />
 
@@ -115,11 +142,50 @@ function LevelsPage() {
                     {canManage && (
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
-                          <a href={`/levels/${l.id}/edit`}>
-                            <Button variant="ghost" size="icon">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </a>
+                          <Dialog open={editId === l.id} onOpenChange={(open) => { if (!open) setEditId(null); }}>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(l)}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-lg">
+                              <DialogHeader><DialogTitle>تعديل المستوى</DialogTitle></DialogHeader>
+                              <div className="space-y-4 py-2">
+                                <div className="space-y-1.5">
+                                  <Label>الاسم</Label>
+                                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>الوصف</Label>
+                                  <Textarea value={editDescription} onChange={(e) => setEditDescription(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>الترتيب</Label>
+                                  <Input type="number" value={editOrder} onChange={(e) => setEditOrder(e.target.value)} />
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    id="edit_is_active"
+                                    type="checkbox"
+                                    checked={editIsActive}
+                                    onChange={(e) => setEditIsActive(e.target.checked)}
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <Label htmlFor="edit_is_active">نشط</Label>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
+                                <Button
+                                  onClick={() => updateMutation.mutate({ id: l.id, data: { name: editName, description: editDescription || undefined, order: Number(editOrder), is_active: editIsActive } })}
+                                  disabled={updateMutation.isPending}
+                                >
+                                  {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                  حفظ
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           <Dialog open={deleteId === l.id} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
                             <DialogTrigger asChild>
                               <Button variant="ghost" size="icon" onClick={() => setDeleteId(l.id)}>

@@ -11,6 +11,7 @@ export interface User {
   phone?: string; avatar?: string; is_active: boolean; last_login_at?: string
   email_verified_at?: string; created_at: string; updated_at: string
   teacher?: Teacher; student?: Student; organizer?: Organizer
+  plain_password?: string
 }
 
 export interface Teacher {

@@ -23,8 +23,9 @@ export const Route = createFileRoute("/_authenticated/certificates")({
 })
 
 function CertificatesPage() {
-  const { isAdmin, isOrganizer, isTeacher } = useAuth()
+  const { isAdmin, isOrganizer, isTeacher, isStudent, isParent } = useAuth()
   const canManage = isAdmin || isOrganizer || isTeacher
+  const isStudentOrParent = isStudent || isParent
   const queryClient = useQueryClient()
   const [showForm, setShowForm] = useState(false)
   const [search, setSearch] = useState("")
@@ -44,8 +45,8 @@ function CertificatesPage() {
   })
 
   const { data: certificates, isLoading } = useQuery({
-    queryKey: ["certificates"],
-    queryFn: () => certificateApi.list(),
+    queryKey: ["certificates", isStudentOrParent ? "my" : "all"],
+    queryFn: () => isStudentOrParent ? certificateApi.myList() : certificateApi.list(),
   })
 
   const certificatesList = certificates ?? []
@@ -62,7 +63,7 @@ function CertificatesPage() {
     onSuccess: (res: any) => {
       toast.success("تم إنشاء الشهادة")
       setShowForm(false)
-      queryClient.invalidateQueries({ queryKey: ["certificates"] })
+      queryClient.invalidateQueries({ queryKey: ["certificates", "all"] }); queryClient.invalidateQueries({ queryKey: ["certificates", "my"] })
       if (res?.data?.pdf) {
         downloadPdf(res.data.pdf, res.data.filename || "certificate.pdf")
       }
@@ -80,13 +81,13 @@ function CertificatesPage() {
 
   const deleteMutation = useMutation({
     mutationFn: (id: number) => certificateApi.delete(id),
-    onSuccess: () => { toast.success("تم حذف الشهادة"); queryClient.invalidateQueries({ queryKey: ["certificates"] }); setDeleteId(null) },
+    onSuccess: () => { toast.success("تم حذف الشهادة"); queryClient.invalidateQueries({ queryKey: ["certificates", "all"] }); queryClient.invalidateQueries({ queryKey: ["certificates", "my"] }); setDeleteId(null) },
     onError: () => toast.error("فشل حذف الشهادة"),
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<Certificate> }) => certificateApi.update(id, data),
-    onSuccess: () => { toast.success("تم تحديث الشهادة"); queryClient.invalidateQueries({ queryKey: ["certificates"] }); setEditId(null) },
+    onSuccess: () => { toast.success("تم تحديث الشهادة"); queryClient.invalidateQueries({ queryKey: ["certificates", "all"] }); queryClient.invalidateQueries({ queryKey: ["certificates", "my"] }); setEditId(null) },
     onError: () => toast.error("فشل تحديث الشهادة"),
   })
 

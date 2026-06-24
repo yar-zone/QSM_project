@@ -41,7 +41,7 @@ class OrganizerController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => $request->password,
             'role' => 'organizer',
             'status' => 'active',
         ]);
@@ -83,7 +83,7 @@ class OrganizerController extends Controller
         $userData = [];
         if ($request->has('name')) $userData['name'] = $request->name;
         if ($request->has('email')) $userData['email'] = $request->email;
-        if ($request->has('password')) $userData['password'] = Hash::make($request->password);
+        if ($request->has('password')) $userData['password'] = $request->password;
 
         if (!empty($userData)) {
             $organizer->user()->update($userData);

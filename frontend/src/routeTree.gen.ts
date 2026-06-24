@@ -20,8 +20,8 @@ import { Route as AuthenticatedSubjectsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedStudentsRouteImport } from './routes/_authenticated/students'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedParentsRouteImport } from './routes/_authenticated/parents'
+import { Route as AuthenticatedOrganizersRouteImport } from './routes/_authenticated/organizers'
 import { Route as AuthenticatedMemorizationsRouteImport } from './routes/_authenticated/memorizations'
-import { Route as AuthenticatedMeetingsRouteImport } from './routes/_authenticated/meetings'
 import { Route as AuthenticatedLevelsRouteImport } from './routes/_authenticated/levels'
 import { Route as AuthenticatedExamResultsRouteImport } from './routes/_authenticated/exam-results'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
@@ -35,7 +35,6 @@ import { Route as AuthenticatedSubjectsNewRouteImport } from './routes/_authenti
 import { Route as AuthenticatedStudentsNewRouteImport } from './routes/_authenticated/students.new'
 import { Route as AuthenticatedParentsNewRouteImport } from './routes/_authenticated/parents.new'
 import { Route as AuthenticatedMemorizationsNewRouteImport } from './routes/_authenticated/memorizations.new'
-import { Route as AuthenticatedMeetingsNewRouteImport } from './routes/_authenticated/meetings.new'
 import { Route as AuthenticatedLevelsNewRouteImport } from './routes/_authenticated/levels.new'
 import { Route as AuthenticatedExamResultsNewRouteImport } from './routes/_authenticated/exam-results.new'
 import { Route as AuthenticatedClassesNewRouteImport } from './routes/_authenticated/classes.new'
@@ -102,17 +101,17 @@ const AuthenticatedParentsRoute = AuthenticatedParentsRouteImport.update({
   path: '/parents',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedOrganizersRoute = AuthenticatedOrganizersRouteImport.update({
+  id: '/organizers',
+  path: '/organizers',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedMemorizationsRoute =
   AuthenticatedMemorizationsRouteImport.update({
     id: '/memorizations',
     path: '/memorizations',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedMeetingsRoute = AuthenticatedMeetingsRouteImport.update({
-  id: '/meetings',
-  path: '/meetings',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedLevelsRoute = AuthenticatedLevelsRouteImport.update({
   id: '/levels',
   path: '/levels',
@@ -184,12 +183,6 @@ const AuthenticatedMemorizationsNewRoute =
     id: '/new',
     path: '/new',
     getParentRoute: () => AuthenticatedMemorizationsRoute,
-  } as any)
-const AuthenticatedMeetingsNewRoute =
-  AuthenticatedMeetingsNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedMeetingsRoute,
   } as any)
 const AuthenticatedLevelsNewRoute = AuthenticatedLevelsNewRouteImport.update({
   id: '/new',
@@ -269,8 +262,8 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exam-results': typeof AuthenticatedExamResultsRouteWithChildren
   '/levels': typeof AuthenticatedLevelsRouteWithChildren
-  '/meetings': typeof AuthenticatedMeetingsRouteWithChildren
   '/memorizations': typeof AuthenticatedMemorizationsRouteWithChildren
+  '/organizers': typeof AuthenticatedOrganizersRoute
   '/parents': typeof AuthenticatedParentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/students': typeof AuthenticatedStudentsRouteWithChildren
@@ -282,7 +275,6 @@ export interface FileRoutesByFullPath {
   '/classes/new': typeof AuthenticatedClassesNewRoute
   '/exam-results/new': typeof AuthenticatedExamResultsNewRoute
   '/levels/new': typeof AuthenticatedLevelsNewRoute
-  '/meetings/new': typeof AuthenticatedMeetingsNewRoute
   '/memorizations/new': typeof AuthenticatedMemorizationsNewRoute
   '/parents/new': typeof AuthenticatedParentsNewRoute
   '/students/new': typeof AuthenticatedStudentsNewRoute
@@ -308,8 +300,8 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exam-results': typeof AuthenticatedExamResultsRouteWithChildren
   '/levels': typeof AuthenticatedLevelsRouteWithChildren
-  '/meetings': typeof AuthenticatedMeetingsRouteWithChildren
   '/memorizations': typeof AuthenticatedMemorizationsRouteWithChildren
+  '/organizers': typeof AuthenticatedOrganizersRoute
   '/parents': typeof AuthenticatedParentsRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/students': typeof AuthenticatedStudentsRouteWithChildren
@@ -321,7 +313,6 @@ export interface FileRoutesByTo {
   '/classes/new': typeof AuthenticatedClassesNewRoute
   '/exam-results/new': typeof AuthenticatedExamResultsNewRoute
   '/levels/new': typeof AuthenticatedLevelsNewRoute
-  '/meetings/new': typeof AuthenticatedMeetingsNewRoute
   '/memorizations/new': typeof AuthenticatedMemorizationsNewRoute
   '/parents/new': typeof AuthenticatedParentsNewRoute
   '/students/new': typeof AuthenticatedStudentsNewRoute
@@ -349,8 +340,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exam-results': typeof AuthenticatedExamResultsRouteWithChildren
   '/_authenticated/levels': typeof AuthenticatedLevelsRouteWithChildren
-  '/_authenticated/meetings': typeof AuthenticatedMeetingsRouteWithChildren
   '/_authenticated/memorizations': typeof AuthenticatedMemorizationsRouteWithChildren
+  '/_authenticated/organizers': typeof AuthenticatedOrganizersRoute
   '/_authenticated/parents': typeof AuthenticatedParentsRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/students': typeof AuthenticatedStudentsRouteWithChildren
@@ -362,7 +353,6 @@ export interface FileRoutesById {
   '/_authenticated/classes/new': typeof AuthenticatedClassesNewRoute
   '/_authenticated/exam-results/new': typeof AuthenticatedExamResultsNewRoute
   '/_authenticated/levels/new': typeof AuthenticatedLevelsNewRoute
-  '/_authenticated/meetings/new': typeof AuthenticatedMeetingsNewRoute
   '/_authenticated/memorizations/new': typeof AuthenticatedMemorizationsNewRoute
   '/_authenticated/parents/new': typeof AuthenticatedParentsNewRoute
   '/_authenticated/students/new': typeof AuthenticatedStudentsNewRoute
@@ -390,8 +380,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exam-results'
     | '/levels'
-    | '/meetings'
     | '/memorizations'
+    | '/organizers'
     | '/parents'
     | '/profile'
     | '/students'
@@ -403,7 +393,6 @@ export interface FileRouteTypes {
     | '/classes/new'
     | '/exam-results/new'
     | '/levels/new'
-    | '/meetings/new'
     | '/memorizations/new'
     | '/parents/new'
     | '/students/new'
@@ -429,8 +418,8 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/exam-results'
     | '/levels'
-    | '/meetings'
     | '/memorizations'
+    | '/organizers'
     | '/parents'
     | '/profile'
     | '/students'
@@ -442,7 +431,6 @@ export interface FileRouteTypes {
     | '/classes/new'
     | '/exam-results/new'
     | '/levels/new'
-    | '/meetings/new'
     | '/memorizations/new'
     | '/parents/new'
     | '/students/new'
@@ -469,8 +457,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/exam-results'
     | '/_authenticated/levels'
-    | '/_authenticated/meetings'
     | '/_authenticated/memorizations'
+    | '/_authenticated/organizers'
     | '/_authenticated/parents'
     | '/_authenticated/profile'
     | '/_authenticated/students'
@@ -482,7 +470,6 @@ export interface FileRouteTypes {
     | '/_authenticated/classes/new'
     | '/_authenticated/exam-results/new'
     | '/_authenticated/levels/new'
-    | '/_authenticated/meetings/new'
     | '/_authenticated/memorizations/new'
     | '/_authenticated/parents/new'
     | '/_authenticated/students/new'
@@ -583,18 +570,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedParentsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/organizers': {
+      id: '/_authenticated/organizers'
+      path: '/organizers'
+      fullPath: '/organizers'
+      preLoaderRoute: typeof AuthenticatedOrganizersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/memorizations': {
       id: '/_authenticated/memorizations'
       path: '/memorizations'
       fullPath: '/memorizations'
       preLoaderRoute: typeof AuthenticatedMemorizationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/meetings': {
-      id: '/_authenticated/meetings'
-      path: '/meetings'
-      fullPath: '/meetings'
-      preLoaderRoute: typeof AuthenticatedMeetingsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/levels': {
@@ -687,13 +674,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/memorizations/new'
       preLoaderRoute: typeof AuthenticatedMemorizationsNewRouteImport
       parentRoute: typeof AuthenticatedMemorizationsRoute
-    }
-    '/_authenticated/meetings/new': {
-      id: '/_authenticated/meetings/new'
-      path: '/new'
-      fullPath: '/meetings/new'
-      preLoaderRoute: typeof AuthenticatedMeetingsNewRouteImport
-      parentRoute: typeof AuthenticatedMeetingsRoute
     }
     '/_authenticated/levels/new': {
       id: '/_authenticated/levels/new'
@@ -843,19 +823,6 @@ const AuthenticatedLevelsRouteChildren: AuthenticatedLevelsRouteChildren = {
 const AuthenticatedLevelsRouteWithChildren =
   AuthenticatedLevelsRoute._addFileChildren(AuthenticatedLevelsRouteChildren)
 
-interface AuthenticatedMeetingsRouteChildren {
-  AuthenticatedMeetingsNewRoute: typeof AuthenticatedMeetingsNewRoute
-}
-
-const AuthenticatedMeetingsRouteChildren: AuthenticatedMeetingsRouteChildren = {
-  AuthenticatedMeetingsNewRoute: AuthenticatedMeetingsNewRoute,
-}
-
-const AuthenticatedMeetingsRouteWithChildren =
-  AuthenticatedMeetingsRoute._addFileChildren(
-    AuthenticatedMeetingsRouteChildren,
-  )
-
 interface AuthenticatedMemorizationsRouteChildren {
   AuthenticatedMemorizationsNewRoute: typeof AuthenticatedMemorizationsNewRoute
 }
@@ -937,8 +904,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExamResultsRoute: typeof AuthenticatedExamResultsRouteWithChildren
   AuthenticatedLevelsRoute: typeof AuthenticatedLevelsRouteWithChildren
-  AuthenticatedMeetingsRoute: typeof AuthenticatedMeetingsRouteWithChildren
   AuthenticatedMemorizationsRoute: typeof AuthenticatedMemorizationsRouteWithChildren
+  AuthenticatedOrganizersRoute: typeof AuthenticatedOrganizersRoute
   AuthenticatedParentsRoute: typeof AuthenticatedParentsRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedStudentsRoute: typeof AuthenticatedStudentsRouteWithChildren
@@ -956,8 +923,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExamResultsRoute: AuthenticatedExamResultsRouteWithChildren,
   AuthenticatedLevelsRoute: AuthenticatedLevelsRouteWithChildren,
-  AuthenticatedMeetingsRoute: AuthenticatedMeetingsRouteWithChildren,
   AuthenticatedMemorizationsRoute: AuthenticatedMemorizationsRouteWithChildren,
+  AuthenticatedOrganizersRoute: AuthenticatedOrganizersRoute,
   AuthenticatedParentsRoute: AuthenticatedParentsRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedStudentsRoute: AuthenticatedStudentsRouteWithChildren,

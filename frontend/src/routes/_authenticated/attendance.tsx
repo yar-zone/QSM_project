@@ -45,6 +45,7 @@ function statusBadge(status: string) {
 function AttendancePage() {
   const { isAdmin, isOrganizer, isTeacher, isStudent, isParent } = useAuth()
   const canManage = isAdmin || isOrganizer || isTeacher
+  const isStudentOrParent = isStudent || isParent
   const queryClient = useQueryClient()
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const isChildRoute = pathname !== "/attendance"
@@ -55,14 +56,14 @@ function AttendancePage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
 
   const { data: records, isLoading } = useQuery({
-    queryKey: ["attendance"],
-    queryFn: () => attendanceApi.list(),
+    queryKey: ["attendance", isStudentOrParent ? "my" : "all"],
+    queryFn: () => isStudentOrParent ? attendanceApi.myList() : attendanceApi.list(),
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<Attendance> }) => attendanceApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attendance"] })
+      queryClient.invalidateQueries({ queryKey: ["attendance", "all"] }); queryClient.invalidateQueries({ queryKey: ["attendance", "my"] })
       toast.success("تم تحديث الحضور")
       setEditRecord(null)
     },
@@ -72,7 +73,7 @@ function AttendancePage() {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => attendanceApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["attendance"] })
+      queryClient.invalidateQueries({ queryKey: ["attendance", "all"] }); queryClient.invalidateQueries({ queryKey: ["attendance", "my"] })
       toast.success("تم حذف الحضور")
       setDeleteId(null)
     },

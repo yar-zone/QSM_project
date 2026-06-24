@@ -73,6 +73,19 @@ class MemorizationTrackingController extends Controller
             'year' => 'nullable|string',
         ]);
 
+        $user = $request->user();
+        if ($user->role === 'teacher') {
+            $teacher = $user->teacher;
+            if ($teacher && $teacher->id !== (int)$request->teacher_id) {
+                return response()->json(['success' => false, 'message' => 'لا يمكنك إضافة سجل لمعلم آخر.'], 403);
+            }
+            $classIds = $teacher->classes()->pluck('id');
+            $studentIds = \App\Models\Enrollment::whereIn('class_id', $classIds)->pluck('student_id');
+            if (!in_array((int)$request->student_id, $studentIds->toArray())) {
+                return response()->json(['success' => false, 'message' => 'الطالب ليس ضمن فصولك.'], 403);
+            }
+        }
+
         $tracking = MemorizationTracking::create($request->all());
         $tracking->load(['student.user', 'teacher.user', 'surah']);
 

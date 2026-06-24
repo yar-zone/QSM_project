@@ -27,6 +27,7 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
 
     Route::get('/dashboard', [DashboardController::class, 'index']);
 
@@ -91,6 +92,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('memorization-trackings/yearly-report', [MemorizationTrackingController::class, 'yearlyReport']);
     });
     Route::middleware('role:admin,organizer,teacher,student,parent')->group(function () {
+        Route::get('memorization-trackings/my', [MemorizationTrackingController::class, 'myTrackings']);
         Route::get('memorization-trackings', [MemorizationTrackingController::class, 'index']);
         Route::get('memorization-trackings/{memorization_tracking}', [MemorizationTrackingController::class, 'show']);
         Route::get('memorization-trackings/student-progress', [MemorizationTrackingController::class, 'studentProgress']);
@@ -104,6 +106,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('exam-results/record', [ExamResultController::class, 'record']);
     });
     Route::middleware('role:admin,organizer,teacher,student,parent')->group(function () {
+        Route::get('exam-results/my', [ExamResultController::class, 'myResults']);
         Route::get('exam-results', [ExamResultController::class, 'index']);
         Route::get('exam-results/{exam_result}', [ExamResultController::class, 'show']);
     });
@@ -116,6 +119,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('certificates/{certificate}', [CertificateController::class, 'destroy']);
     });
     Route::middleware('role:admin,organizer,teacher,student,parent')->group(function () {
+        Route::get('certificates/my', [CertificateController::class, 'myCertificates']);
         Route::get('certificates', [CertificateController::class, 'index']);
         Route::get('certificates/{certificate}', [CertificateController::class, 'show']);
         Route::post('certificates/{certificate}/verify', [CertificateController::class, 'verify']);
@@ -154,6 +158,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('attendances/class-reports', [AttendanceController::class, 'classReports']);
     });
     Route::middleware('role:admin,organizer,teacher,student,parent')->group(function () {
+        Route::get('attendances/my', [AttendanceController::class, 'myAttendance']);
         Route::get('attendances', [AttendanceController::class, 'index']);
         Route::get('attendances/{attendance}', [AttendanceController::class, 'show']);
         Route::get('attendances/class', [AttendanceController::class, 'classAttendance']);
@@ -178,6 +183,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/users/{user}/deactivate', [UserController::class, 'deactivate']);
         Route::post('/users/{user}/reactivate', [UserController::class, 'reactivate']);
         Route::get('/users', [UserController::class, 'index']);
+        Route::put('/users/{user}', [UserController::class, 'update']);
+        Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword']);
     });
 
     // Parents: admin, organizer, teacher, parent

@@ -59,6 +59,18 @@ class CertificateController extends Controller
             'certificate_type' => 'required|string',
         ]);
 
+        $user = $request->user();
+        if ($user->role === 'teacher') {
+            $teacher = $user->teacher;
+            if ($teacher) {
+                $classIds = $teacher->classes()->pluck('id');
+                $studentIds = \App\Models\Enrollment::whereIn('class_id', $classIds)->pluck('student_id');
+                if (!in_array((int)$request->student_id, $studentIds->toArray())) {
+                    return response()->json(['success' => false, 'message' => 'الطالب ليس ضمن فصولك.'], 403);
+                }
+            }
+        }
+
         $certificate = Certificate::create([
             'student_id' => $request->student_id,
             'exam_result_id' => $request->exam_result_id,

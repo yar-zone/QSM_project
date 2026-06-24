@@ -1,20 +1,21 @@
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Plus, Inbox, Trash2, Pencil, Search } from "lucide-react"
+import { Plus, Inbox, Trash2, Pencil, Search, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { useState, useMemo } from "react"
 
-import { parentApi } from "@/services/api"
+import { parentApi, studentApi } from "@/services/api"
 import type { User } from "@/types"
 import { useAuth } from "@/hooks/use-auth"
-import { ROLE_LABELS } from "@/lib/roles"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { TableSkeleton } from "@/components/ui/table-skeleton"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/parents")({
   component: ParentsPage,
@@ -26,6 +27,17 @@ function ParentsPage() {
   const { isAdmin, isOrganizer } = useAuth()
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
+  const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [editName, setEditName] = useState("")
+  const [editEmail, setEditEmail] = useState("")
+  const [editPhone, setEditPhone] = useState("")
+  const [editStudents, setEditStudents] = useState<number[]>([])
+
+  const { data: students } = useQuery({
+    queryKey: ["students"],
+    queryFn: () => studentApi.list(),
+  })
 
   const { data, isLoading } = useQuery({
     queryKey: ["parents"],
@@ -46,11 +58,36 @@ function ParentsPage() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["parents"] })
       toast.success("تم حذف ولي الأمر")
+      setDeleteId(null)
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "فشل حذف ولي الأمر")
     },
   })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Record<string, unknown> }) => parentApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["parents"] })
+      toast.success("تم تحديث ولي الأمر")
+      setEditId(null)
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "فشل تحديث ولي الأمر")
+    },
+  })
+
+  function openEdit(parent: User) {
+    setEditName(parent.name ?? "")
+    setEditEmail(parent.email ?? "")
+    setEditPhone(parent.phone ?? "")
+    setEditStudents((parent as any).parentStudents?.map((s: any) => s.id) ?? [])
+    setEditId(parent.id)
+  }
+
+  function toggleEditStudent(id: number) {
+    setEditStudents(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id])
+  }
 
   if (isChildRoute) return <Outlet />
 
@@ -100,7 +137,7 @@ function ParentsPage() {
                 <TableHead>الأبناء</TableHead>
                 <TableHead>الهاتف</TableHead>
                 <TableHead>الحالة</TableHead>
-                <TableHead className="w-24">الإجراءات</TableHead>
+                  <TableHead className="w-24">الإجراءات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -124,29 +161,86 @@ function ParentsPage() {
                     <TableCell>{parent.phone ?? "—"}</TableCell>
                     <TableCell>
                       <Badge variant={parent.is_active ? "default" : "secondary"}>
-                        {parent.is_active ? "Active" : "Inactive"}
+                        {parent.is_active ? "نشط" : "غير نشط"}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">
-                        {canManage && (
-                          <a href={`/parents/${parent.id}/edit`}>
-                            <Button variant="outline" size="icon">
+                        <Dialog open={editId === parent.id} onOpenChange={(open) => { if (!open) setEditId(null); }}>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => openEdit(parent)}>
                               <Pencil className="h-4 w-4" />
                             </Button>
-                          </a>
-                        )}
-                        {canManage && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() => {
-                              if (confirm("Are you sure?")) deleteMutation.mutate(parent.id)
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
+                          </DialogTrigger>
+                          <DialogContent className="max-w-lg">
+                            <DialogHeader><DialogTitle>تعديل ولي الأمر</DialogTitle></DialogHeader>
+                            <div className="space-y-4 py-2">
+                              <div className="space-y-1.5">
+                                <Label>الاسم الكامل</Label>
+                                <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label>البريد الإلكتروني</Label>
+                                <Input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label>الهاتف</Label>
+                                <Input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+                              </div>
+                              <div className="space-y-1.5">
+                                <Label>الطلاب المرتبطون</Label>
+                                {students && students.length > 0 ? (
+                                  <div className="max-h-48 overflow-y-auto rounded-md border p-2 space-y-1">
+                                    {students.map((s) => {
+                                      const checked = editStudents.includes(s.id)
+                                      return (
+                                        <label key={s.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted rounded px-1 py-0.5">
+                                          <input type="checkbox" checked={checked} onChange={() => toggleEditStudent(s.id)} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
+                                          {s.user?.name ?? `طالب #${s.id}`}
+                                        </label>
+                                      )
+                                    })}
+                                  </div>
+                                ) : (
+                                  <p className="text-sm text-muted-foreground">لا يوجد طلاب متاحون.</p>
+                                )}
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
+                              <Button
+                                onClick={() => updateMutation.mutate({ id: parent.id, data: { name: editName, email: editEmail, phone: editPhone || undefined, student_ids: editStudents } })}
+                                disabled={updateMutation.isPending}
+                              >
+                                {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                حفظ
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        <Dialog open={deleteId === parent.id} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" size="icon" onClick={() => setDeleteId(parent.id)}>
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader><DialogTitle>تأكيد الحذف</DialogTitle>
+                              <DialogDescription>هل أنت متأكد من حذف ولي الأمر {parent.name}؟ لا يمكن التراجع عن هذا الإجراء.</DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                              <Button variant="outline" onClick={() => setDeleteId(null)}>إلغاء</Button>
+                              <Button
+                                variant="destructive"
+                                onClick={() => deleteMutation.mutate(parent.id)}
+                                disabled={deleteMutation.isPending}
+                              >
+                                {deleteMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                حذف
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </TableCell>
                   </TableRow>

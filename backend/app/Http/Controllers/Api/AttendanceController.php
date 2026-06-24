@@ -65,6 +65,17 @@ class AttendanceController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $user = $request->user();
+        if ($user->role === 'teacher') {
+            $teacher = $user->teacher;
+            if ($teacher) {
+                $classIds = $teacher->classes()->pluck('id');
+                if (!in_array((int)$request->class_id, $classIds->toArray())) {
+                    return response()->json(['success' => false, 'message' => 'الفصل ليس ضمن فصولك.'], 403);
+                }
+            }
+        }
+
         $attendance = Attendance::updateOrCreate(
             [
                 'student_id' => $request->student_id,

@@ -6,14 +6,16 @@ import { toast } from "sonner"
 
 import { useAuth } from "@/hooks/use-auth"
 
-import { studentApi } from "@/services/api"
-import type { Student } from "@/types"
+import { studentApi, classApi } from "@/services/api"
+import type { Student, Classe } from "@/types"
 import { PageHeader } from "@/components/dashboard/page-header"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 
 export const Route = createFileRoute("/_authenticated/students")({
@@ -28,9 +30,20 @@ function StudentsPage() {
   const isChildRoute = pathname !== "/students"
   const [search, setSearch] = useState("")
   const [deleteId, setDeleteId] = useState<number | null>(null)
+  const [editId, setEditId] = useState<number | null>(null)
+  const [editName, setEditName] = useState("")
+  const [editEmail, setEditEmail] = useState("")
+  const [editPhone, setEditPhone] = useState("")
+  const [editIsActive, setEditIsActive] = useState(true)
+  const [editClassIds, setEditClassIds] = useState<number[]>([])
   const { data, isLoading } = useQuery({
     queryKey: ["students"],
     queryFn: () => studentApi.list(),
+  })
+
+  const { data: classes } = useQuery({
+    queryKey: ["classes"],
+    queryFn: () => classApi.list(),
   })
 
   const deleteMutation = useMutation({
@@ -42,6 +55,31 @@ function StudentsPage() {
     },
     onError: (err: any) => toast.error(err?.response?.data?.message || "فشل حذف الطالب"),
   })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Record<string, unknown> }) => studentApi.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["students"] })
+      toast.success("تم تحديث الطالب")
+      setEditId(null)
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "فشل تحديث الطالب")
+    },
+  })
+
+  function openEdit(s: Student) {
+    setEditName(s.user?.name ?? "")
+    setEditEmail(s.user?.email ?? "")
+    setEditPhone(s.phone ?? "")
+    setEditIsActive(s.is_active)
+    setEditClassIds((s as any).enrollments?.map((e: any) => e.class_id) ?? [])
+    setEditId(s.id)
+  }
+
+  function toggleEditClass(id: number) {
+    setEditClassIds(prev => prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id])
+  }
 
   const studentsList = data ?? []
   const filteredStudents = useMemo(() => {
@@ -118,11 +156,64 @@ function StudentsPage() {
                     {canManage && (
                       <TableCell>
                         <div className="flex items-center justify-center gap-1">
-                          <a href={`/students/${s.id}/edit`}>
-                            <Button variant="ghost" size="icon">
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                          </a>
+                          <Dialog open={editId === s.id} onOpenChange={(open) => { if (!open) setEditId(null); }}>
+                            <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" onClick={() => openEdit(s)}>
+                                <Pencil className="h-4 w-4" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-lg">
+                              <DialogHeader><DialogTitle>تعديل الطالب</DialogTitle></DialogHeader>
+                              <div className="space-y-4 py-2 max-h-[60vh] overflow-y-auto">
+                                <div className="space-y-1.5">
+                                  <Label>الاسم الكامل</Label>
+                                  <Input value={editName} onChange={(e) => setEditName(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>البريد الإلكتروني</Label>
+                                  <Input type="email" value={editEmail} onChange={(e) => setEditEmail(e.target.value)} />
+                                </div>
+                                <div className="space-y-1.5">
+                                  <Label>الهاتف</Label>
+                                  <Input type="tel" value={editPhone} onChange={(e) => setEditPhone(e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                  <Label>الفصول</Label>
+                                  <div className="max-h-40 overflow-y-auto rounded-md border p-2 space-y-1">
+                                    {classes && classes.length > 0 ? classes.map((c: Classe) => {
+                                      const checked = editClassIds.includes(c.id)
+                                      return (
+                                        <label key={c.id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-muted rounded px-1 py-0.5">
+                                          <input type="checkbox" checked={checked} onChange={() => toggleEditClass(c.id)} className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
+                                          {c.name}
+                                        </label>
+                                      )
+                                    }) : <p className="text-sm text-muted-foreground">لا يوجد فصول متاحة.</p>}
+                                  </div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <input
+                                    id="edit_is_active"
+                                    type="checkbox"
+                                    checked={editIsActive}
+                                    onChange={(e) => setEditIsActive(e.target.checked)}
+                                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                  />
+                                  <Label htmlFor="edit_is_active">نشط</Label>
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
+                                <Button
+                                  onClick={() => updateMutation.mutate({ id: s.id, data: { name: editName, email: editEmail, phone: editPhone || undefined, is_active: editIsActive, class_ids: editClassIds } })}
+                                  disabled={updateMutation.isPending}
+                                >
+                                  {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
+                                  حفظ
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                           <Dialog open={deleteId === s.id} onOpenChange={(open) => { if (!open) setDeleteId(null); }}>
                             <DialogTrigger asChild>
                               <Button variant="ghost" size="icon" onClick={() => setDeleteId(s.id)}>
