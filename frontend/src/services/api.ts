@@ -38,7 +38,10 @@ api.interceptors.response.use(
 
 export const authApi = {
   login: (data: LoginCredentials) => api.post<AuthResponse>('/auth/login', data).then(r => ({ ...r.data, user: r.data.data.user, token: r.data.data.token })),
-  register: (data: RegisterData) => api.post<AuthResponse>('/auth/register', data).then(r => ({ ...r.data, user: r.data.data.user, token: r.data.data.token })),
+  register: (data: RegisterData) => api.post('/auth/register', data).then(r => r.data),
+  verifyEmail: (email: string, code: string) => api.post('/auth/verify-email', { email, code }).then(r => r.data),
+  resendVerification: (email: string) => api.post('/auth/resend-verification', { email }).then(r => r.data),
+  googleLogin: (idToken: string) => api.post<AuthResponse>('/auth/google', { id_token: idToken }).then(r => ({ ...r.data, user: r.data.data.user, token: r.data.data.token })),
   me: () => api.get<ApiResponse<User>>('/auth/me').then(r => r.data.data),
   logout: () => api.post('/auth/logout'),
   changePassword: (data: { current_password: string; new_password: string; new_password_confirmation: string }) => api.post('/auth/change-password', data).then(r => r.data),

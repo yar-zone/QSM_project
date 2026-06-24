@@ -2,11 +2,19 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\EmailHelper;
 use App\Http\Controllers\Controller;
+use App\Mail\VerificationCodeMail;
+use App\Models\EmailVerificationCode;
 use App\Models\User;
+use Carbon\Carbon;
+use Firebase\JWT\JWK;
+use Firebase\JWT\JWT;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -59,6 +67,13 @@ class AuthController extends Controller
             'role' => 'required|string|in:teacher,student,parent',
         ]);
 
+        if (EmailHelper::isDisposable($request->email)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'يرجى استخدام بريد إلكتروني حقيقي. البريد المؤقت غير مسموح به.',
+            ], 422);
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -75,7 +90,168 @@ class AuthController extends Controller
             // No separate profile table for parents; user record is sufficient
         }
 
+        $this->sendVerificationCode($user);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'email' => $user->email,
+            ],
+            'message' => 'تم إنشاء الحساب. يرجى التحقق من بريدك الإلكتروني.',
+        ], 201);
+    }
+
+    public function verifyEmail(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'code' => 'required|string|size:6',
+        ]);
+
+        $record = EmailVerificationCode::where('email', $request->email)
+            ->where('code', $request->code)
+            ->where('expires_at', '>', Carbon::now())
+            ->first();
+
+        if (!$record) {
+            return response()->json([
+                'success' => false,
+                'message' => 'الكود غير صحيح أو منتهي الصلاحية.',
+            ], 422);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        $user->update(['email_verified_at' => Carbon::now()]);
+
+        $record->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم التحقق من البريد الإلكتروني بنجاح. حسابك قيد انتظار موافقة الإدارة.',
+        ]);
+    }
+
+    public function resendVerificationCode(Request $request): JsonResponse
+    {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user->email_verified_at) {
+            return response()->json([
+                'success' => false,
+                'message' => 'البريد الإلكتروني موثق بالفعل.',
+            ], 422);
+        }
+
+        $this->sendVerificationCode($user);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إرسال كود التحقق مرة أخرى.',
+        ]);
+    }
+
+    private function sendVerificationCode(User $user): void
+    {
+        EmailVerificationCode::where('email', $user->email)->delete();
+
+        $code = str_pad((string) random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+
+        EmailVerificationCode::create([
+            'email' => $user->email,
+            'code' => $code,
+            'expires_at' => Carbon::now()->addMinutes(10),
+        ]);
+
+        try {
+            Mail::to($user->email)->send(new VerificationCodeMail($code, $user->name));
+        } catch (\Exception $e) {
+            // Log silently — mail config may not be set up
+        }
+    }
+
+    public function googleLogin(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id_token' => 'required|string',
+        ]);
+
+        $clientId = config('services.google.client_id');
+        if (!$clientId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Google login is not configured.',
+            ], 500);
+        }
+
+        try {
+            $keysUrl = 'https://www.googleapis.com/oauth2/v3/certs';
+            $keySet = json_decode(file_get_contents($keysUrl), true);
+            $keys = JWK::parseKeySet($keySet);
+
+            $decoded = JWT::decode($request->id_token, $keys);
+            $payload = (array) $decoded;
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من البريد الإلكتروني.',
+            ], 401);
+        }
+
+        if (($payload['aud'] ?? null) !== $clientId) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من البريد الإلكتروني.',
+            ], 401);
+        }
+
+        if (!in_array($payload['iss'] ?? '', ['accounts.google.com', 'https://accounts.google.com'])) {
+            return response()->json([
+                'success' => false,
+                'message' => 'فشل التحقق من البريد الإلكتروني.',
+            ], 401);
+        }
+
+        $email = $payload['email'] ?? null;
+        if (!$email) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم توفير البريد الإلكتروني من Google.',
+            ], 400);
+        }
+
+        if (EmailHelper::isDisposable($email)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'يرجى استخدام بريد إلكتروني حقيقي. البريد المؤقت غير مسموح به.',
+            ], 422);
+        }
+
+        $name = $payload['name'] ?? explode('@', $email)[0];
+        $googleId = $payload['sub'] ?? null;
+
+        $user = User::where('email', $email)->first();
+
+        if (!$user) {
+            $user = User::create([
+                'name' => $name,
+                'email' => $email,
+                'password' => \Illuminate\Support\Str::random(32),
+                'role' => 'parent',
+                'status' => 'active',
+            ]);
+        }
+
+        if ($user->status !== 'active') {
+            $user->update(['status' => 'active']);
+        }
+
         $token = $user->createToken('auth-token')->plainTextToken;
+        $user->update(['last_login_at' => now()]);
+        $user->load($this->getUserRelations($user->role));
 
         return response()->json([
             'success' => true,
@@ -83,8 +259,8 @@ class AuthController extends Controller
                 'user' => $user,
                 'token' => $token,
             ],
-            'message' => 'Registration successful. Please wait for account approval.',
-        ], 201);
+            'message' => 'تم تسجيل الدخول بحساب Google.',
+        ]);
     }
 
     public function me(Request $request): JsonResponse

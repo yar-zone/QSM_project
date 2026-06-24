@@ -22,7 +22,10 @@ use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
+Route::post('/auth/verify-email', [AuthController::class, 'verifyEmail']);
+Route::post('/auth/resend-verification', [AuthController::class, 'resendVerificationCode']);
 Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/google', [AuthController::class, 'googleLogin']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
