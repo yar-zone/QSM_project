@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $admin = User::firstOrCreate(
-            ['email' => 'admin@qsm.com'],
-            ['name' => 'Admin', 'password' => 'password', 'role' => 'admin', 'status' => 'active']
+            ['email' => 'nur.quran.school@gmail.com'],
+            ['name' => 'Admin', 'password' => 'toumi1916', 'role' => 'admin', 'status' => 'active']
         );
 
         $organizerUser = User::firstOrCreate(
