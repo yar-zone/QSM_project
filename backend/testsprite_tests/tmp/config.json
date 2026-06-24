@@ -1,0 +1,20 @@
+{
+  "status": "commited",
+  "type": "backend",
+  "scope": "codebase",
+  "localEndpoint": "http://localhost:8000",
+  "backendAuthType": "API key",
+  "backendApiKey": "first test",
+  "backendApiValue": "sk-user-j_4Iyd-piUOcSMuAB4l8usGdtQ9DS72LMnQsufutvotjh4dhr4v9O8uelAxosIN0tm0s9T5dk4ZMeSHMe5HYVSfWGMaVE-bvoPJ3NJdY12pBilqe390vS3Odj99C4jhbUvw",
+  "executionArgs": {
+    "projectName": "backend",
+    "projectPath": "c:\\Users\\Informatics\\Downloads\\VS Codes\\Project1\\QSM_project\\backend",
+    "testIds": [],
+    "additionalInstruction": "",
+    "serverMode": "development",
+    "envs": {
+      "API_KEY": "sk-user-j_4Iyd-piUOcSMuAB4l8usGdtQ9DS72LMnQsufutvotjh4dhr4v9O8uelAxosIN0tm0s9T5dk4ZMeSHMe5HYVSfWGMaVE-bvoPJ3NJdY12pBilqe390vS3Odj99C4jhbUvw"
+    }
+  },
+  "serverPort": 63724
+}

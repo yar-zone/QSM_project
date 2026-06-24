@@ -1,0 +1,46 @@
+version: "2"
+type: backend
+tech_stack:
+  - Laravel 12
+  - PHP 8.2
+  - SQLite
+  - Sanctum
+features:
+  - name: Authentication API
+    description: User authentication with Sanctum
+    files:
+      - app/Http/Controllers/Api/AuthController.php
+    endpoints:
+      - method: POST
+        path: /api/auth/login
+        description: Authenticate user
+        auth_required: false
+        request_schema:
+          body:
+            email: string
+            password: string
+        response_schema:
+          "200": Token
+  - name: Students Management API
+    description: CRUD operations for students
+    files:
+      - app/Http/Controllers/Api/StudentController.php
+    endpoints:
+      - method: GET
+        path: /api/students
+        description: List all students
+        auth_required: true
+        response_schema:
+          "200": Student[]
+  - name: Classes Management API
+    description: CRUD operations for classes
+    files:
+      - app/Http/Controllers/Api/ClassController.php
+    endpoints:
+      - method: GET
+        path: /api/classes
+        description: List all classes
+        auth_required: true
+        response_schema:
+          "200": Class[]
+known_limitations: []
