@@ -1,0 +1,17 @@
+.git
+.gitignore
+.vite
+dist
+node_modules
+npm-debug.log
+testsprite_tests
+*.md
+.prettierrc
+.prettierignore
+.eslintrc
+eslint.config.js
+standalone.html
+AGENTS.md
+bun.lock
+bunfig.toml
+tsconfig*.json

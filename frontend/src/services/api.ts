@@ -1,6 +1,6 @@
 import axios from 'axios'
 import type { AuthResponse, RegisterData, LoginCredentials, ApiResponse, PaginatedResponse, User, Student, Teacher, Classe, Level, Subject, Surah, MemorizationTracking, ExamRequest, ExamResult, Certificate, Announcement, Meeting, Attendance, Notification, AuditLog, Organizer, DashboardStats } from '@/types'
-import { TOKEN_KEY } from '@/lib/constants'
+import { TOKEN_KEY, USER_KEY } from '@/lib/constants'
 
 function extractArray<T>(data: unknown): T[] {
   if (Array.isArray(data)) return data
@@ -23,9 +23,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      const url = error.config?.url || ''
+      // Don't intercept login/register failures — let the form handle them
+      if (url.includes('/auth/login') || url.includes('/auth/register')) {
+        return Promise.reject(error)
+      }
       localStorage.removeItem(TOKEN_KEY)
-      localStorage.removeItem('qsm_user')
-      window.location.href = '/login'
+      localStorage.removeItem(USER_KEY)
+      window.dispatchEvent(new Event('auth:logout'))
     }
     return Promise.reject(error)
   }

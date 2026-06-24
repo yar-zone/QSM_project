@@ -2,9 +2,9 @@
   "status": "commited",
   "type": "frontend",
   "scope": "codebase",
-  "localEndpoint": "http://localhost:5175",
+  "localEndpoint": "http://localhost:5173",
   "executionArgs": {
-    "projectName": "frontend",
+    "projectName": "QSM_project",
     "projectPath": "c:\\Users\\Informatics\\Downloads\\VS Codes\\Project1\\QSM_project\\frontend",
     "testIds": [],
     "additionalInstruction": "",
@@ -13,5 +13,5 @@
       "API_KEY": "sk-user-j_4Iyd-piUOcSMuAB4l8usGdtQ9DS72LMnQsufutvotjh4dhr4v9O8uelAxosIN0tm0s9T5dk4ZMeSHMe5HYVSfWGMaVE-bvoPJ3NJdY12pBilqe390vS3Odj99C4jhbUvw"
     }
   },
-  "serverPort": 54687
+  "serverPort": 58905
 }

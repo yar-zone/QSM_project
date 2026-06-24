@@ -1209,7 +1209,7 @@ body {
         <div class="metadata-container">
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Project Name</div>
-          <div class="metadata-value text-body">backend (QSM Project)</div>
+          <div class="metadata-value text-body">N/A</div>
         </div>
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Date</div>
@@ -1234,14 +1234,41 @@ body {
         
         <div class="coverage-summary">
           <ul class="coverage-list text-body">
-            <li><span class="coverage-highlight">0/3</span> of tests passed</li>
+            <li><span class="coverage-highlight">0/0</span> of tests passed</li>
             <li><span class="coverage-highlight">Key gaps / risks:</span>
             
-              <ol>
-<li><strong>Authentication Data Dependency:</strong> Tests depend on valid seeded user data. The 401 errors indicate that either the database wasn't properly seeded with <code>php artisan db:seed</code> before testing, or the test scripts are using arbitrary credentials instead of the project's standard demo credentials (e.g., <code>admin@qsm.com</code> / <code>password</code>).</li>
-<li><strong>Server-Side Errors (500):</strong> The 500 error on the <code>/api/students</code> endpoint points to a potential unhandled exception in the Laravel backend when accessed under test conditions. This requires reviewing the <code>laravel.log</code> or API response body to determine the root cause (e.g., missing database tables or unhandled null relationships).</li>
-<li><strong>Cascading Test Failures:</strong> Tests for protected endpoints (like Classes) are currently blocked because they fail to authenticate first. Fixing the authentication step is a prerequisite to validating other endpoints.</li>
-</ol>
+              <h3>🔴 Critical — Post-Login 404 Redirect</h3>
+<p><strong>Affected tests:</strong> TC001, TC006, TC008, TC009, TC012, TC014 (6 tests, 40% of suite)</p>
+<p>After submitting the login form with <code>example@gmail.com / password123</code>, the application consistently redirects to a <strong>404 &quot;الصفحة غير موجودة&quot;</strong> page. This is the single highest-priority issue.</p>
+<p><strong>Likely causes to investigate:</strong></p>
+<ul>
+<li>The backend <code>/api/login</code> endpoint may not be reachable from the test environment (TestSprite uses placeholder credentials — the app needs real seeded credentials).</li>
+<li>The <code>LOGIN_USER</code> / <code>LOGIN_PASSWORD</code> placeholders in the test plan may not have been replaced with actual working credentials.</li>
+<li>The post-authentication redirect route in TanStack Router may be misconfigured (e.g., redirecting to a route that doesn't exist yet).</li>
+<li>CORS or session/cookie configuration between the Vite dev server (port 5173) and Laravel (port 8000) may be rejecting the login request.</li>
+</ul>
+<blockquote>
+<p><strong>Recommended fix:</strong> Seed the database with a known user (e.g., <code>admin@qsm.test</code> / <code>password</code>) and re-run the test suite with those credentials supplied via the TestSprite login config.</p>
+</blockquote>
+<hr>
+<h3>🟡 Medium — Pending Approval Account State (TC010)</h3>
+<p><strong>Affected test:</strong> TC010 — Create a new student record</p>
+<p>A newly-registered teacher account is placed in a <strong>pending-approval state</strong> (&quot;حسابك قيد المراجعة&quot;), which blocks access to student-creation controls. This is likely expected business logic but means:</p>
+<ul>
+<li>Tests that register a new account cannot proceed without an admin approving it.</li>
+<li>The test plan should use a <strong>pre-approved admin/staff account</strong> for seeded test data.</li>
+</ul>
+<hr>
+<h3>🟡 Medium — Test Credentials Not Configured</h3>
+<p>TestSprite used placeholder credentials (<code>example@gmail.com / password123</code>). For future runs, configure real credentials by setting <code>LOGIN_USER</code> and <code>LOGIN_PASSWORD</code> in the TestSprite environment or project config. This will allow all 8 currently-failing/blocked tests to execute their actual assertions.</p>
+<hr>
+<h3>🟢 Positive Findings</h3>
+<ul>
+<li>✅ <strong>Route guards work correctly</strong> — All three unauthenticated-redirect tests (TC002, TC003, TC004) passed.</li>
+<li>✅ <strong>In-app navigation is solid</strong> — Cross-section navigation (students ↔ teachers ↔ dashboard) works once authenticated (TC011, TC013).</li>
+<li>✅ <strong>Validation feedback is present</strong> — Incomplete login form submission shows proper UI feedback (TC015).</li>
+<li>✅ <strong>Dashboard renders correctly</strong> — Statistics and content display properly when the session is already authenticated (TC005).</li>
+</ul>
 
             </li>
 </ul>
@@ -1266,26 +1293,34 @@ body {
           <div class="table-rows">
             
             <div class="table-row">
-              <div class="table-cell"><span class="text-body">Requirement 1: Authentication API</span></div>
-              <div class="table-cell"><span class="text-body">1</span></div>
+              <div class="table-cell"><span class="text-body">REQ-01 · Authentication</span></div>
               <div class="table-cell"><span class="text-body">0</span></div>
-              <div class="table-cell"><span class="text-body">1</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
             </div>
         
 
             <div class="table-row">
-              <div class="table-cell"><span class="text-body">Requirement 2: Students Management API</span></div>
-              <div class="table-cell"><span class="text-body">1</span></div>
+              <div class="table-cell"><span class="text-body">REQ-02 · Dashboard</span></div>
               <div class="table-cell"><span class="text-body">0</span></div>
-              <div class="table-cell"><span class="text-body">1</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
             </div>
         
 
             <div class="table-row">
-              <div class="table-cell"><span class="text-body">Requirement 3: Classes Management API</span></div>
-              <div class="table-cell"><span class="text-body">1</span></div>
+              <div class="table-cell"><span class="text-body">REQ-03 · Student Management</span></div>
               <div class="table-cell"><span class="text-body">0</span></div>
-              <div class="table-cell"><span class="text-body">1</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
+            </div>
+        
+
+            <div class="table-row">
+              <div class="table-cell"><span class="text-body">REQ-04 · Teacher Management</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
+              <div class="table-cell"><span class="text-body">0</span></div>
             </div>
         
           </div>
@@ -1308,13 +1343,13 @@ body {
           <div class="accordion-header" onclick="toggleAccordion(this)">
             <div class="requirement-content">
                                           <div class="requirement-title-row">
-              <h3 class="title-requirement">Requirement 1: Authentication API</h3>
-                <div class="requirement-status-tag status-error">
+              <h3 class="title-requirement">REQ-01 · Authentication</h3>
+                <div class="requirement-status-tag status-success">
               <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="7.99961" cy="7.99998" r="6.4" fill="#C23539" fill-opacity="0.2"/>
-                <path d="M8 5.59998V7.99698" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10.394V10.3995" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="7.99961" cy="7.99998" r="6.4" fill="#10A363" fill-opacity="0.2"/>
+                <path d="M5.59961 8.00002L7.19961 9.60002L10.3996 6.40002" stroke="#19C379" stroke-width="1.28" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              <span>0/1</span>
+              <span>0/0</span>
             </div>
               </div>
               <p class="text-body-medium requirement-description">Proper error handling for API calls and invalid data scenarios.</p>
@@ -1328,54 +1363,7 @@ body {
 
             <div class="accordion-content">
             <div class="test-wrapper">
-<div class="test-card">
-                <div class="test-header">
-                  <h4 class="text-body-medium">TC001: postapiauthloginwithvalidcredentials</h4>
-                </div>
-                <div class="test-content">
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Code</div>
-                    <div class="test-field-value text-body">
-                      <a href="./TC001_postapiauthloginwithvalidcredentials.py" class="text-link">TC001_postapiauthloginwithvalidcredentials.py</a>
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Error</div>
-                    <div class="test-field-value text-body">`AssertionError: Expected status code 200, got 401`</div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Visualization and Result</div>
-                    <div class="test-field-value text-body">
-                      <a href="[Link](https://www.testsprite.com/dashboard/mcp/tests/300b8716-4e7c-4ab5-8175-fdce991d16b5/7f5fbe7b-a808-4b02-839d-237c401e7ff2)" class="text-link">View Results</a>
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Status</div>
-                    <div class="test-field-value">
-                      
-            <div class="status-wrapper">
-                <div class="status-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="7.99961" cy="7.99998" r="6.4" fill="#C23539" fill-opacity="0.2"/>
-<path d="M8 5.59998V7.99698" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M8 10.394V10.3995" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-                </div>
-                <span class="text-body status-fail">Failed</span>
-            </div>
-            
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Severity</div>
-                    <div class="test-field-value text-body">N/A</div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Analysis / Findings</div>
-                    <div class="test-field-value text-body">The test failed with a 401 Unauthorized error. This indicates that the credentials used by the test script did not match any valid user in the database. The QSM project uses demo credentials (e.g., `admin@qsm.com` / `password`), which need to be explicitly seeded or provided to the test environment.</div>
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -1384,13 +1372,13 @@ body {
           <div class="accordion-header" onclick="toggleAccordion(this)">
             <div class="requirement-content">
                                           <div class="requirement-title-row">
-              <h3 class="title-requirement">Requirement 2: Students Management API</h3>
-                <div class="requirement-status-tag status-error">
+              <h3 class="title-requirement">REQ-02 · Dashboard</h3>
+                <div class="requirement-status-tag status-success">
               <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="7.99961" cy="7.99998" r="6.4" fill="#C23539" fill-opacity="0.2"/>
-                <path d="M8 5.59998V7.99698" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10.394V10.3995" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="7.99961" cy="7.99998" r="6.4" fill="#10A363" fill-opacity="0.2"/>
+                <path d="M5.59961 8.00002L7.19961 9.60002L10.3996 6.40002" stroke="#19C379" stroke-width="1.28" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              <span>0/1</span>
+              <span>0/0</span>
             </div>
               </div>
               <p class="text-body-medium requirement-description">Proper error handling for API calls and invalid data scenarios.</p>
@@ -1404,54 +1392,7 @@ body {
 
             <div class="accordion-content">
             <div class="test-wrapper">
-<div class="test-card">
-                <div class="test-header">
-                  <h4 class="text-body-medium">TC002: getapistudentswithvalidtoken</h4>
-                </div>
-                <div class="test-content">
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Code</div>
-                    <div class="test-field-value text-body">
-                      <a href="./TC002_getapistudentswithvalidtoken.py" class="text-link">TC002_getapistudentswithvalidtoken.py</a>
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Error</div>
-                    <div class="test-field-value text-body">`AssertionError: Expected status code 200, got 500`</div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Visualization and Result</div>
-                    <div class="test-field-value text-body">
-                      <a href="[Link](https://www.testsprite.com/dashboard/mcp/tests/300b8716-4e7c-4ab5-8175-fdce991d16b5/b7efdb20-3558-436b-bfc0-9440cabb0c0a)" class="text-link">View Results</a>
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Status</div>
-                    <div class="test-field-value">
-                      
-            <div class="status-wrapper">
-                <div class="status-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="7.99961" cy="7.99998" r="6.4" fill="#C23539" fill-opacity="0.2"/>
-<path d="M8 5.59998V7.99698" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M8 10.394V10.3995" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-                </div>
-                <span class="text-body status-fail">Failed</span>
-            </div>
-            
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Severity</div>
-                    <div class="test-field-value text-body">N/A</div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Analysis / Findings</div>
-                    <div class="test-field-value text-body">The test failed with a 500 Internal Server Error. This could be due to a missing authentication token (which shouldn't result in a 500 unless poorly handled), a database issue (e.g., SQLite file missing or unmigrated), or an unhandled exception in `StudentController.php`.</div>
-                  </div>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
@@ -1460,13 +1401,13 @@ body {
           <div class="accordion-header" onclick="toggleAccordion(this)">
             <div class="requirement-content">
                                           <div class="requirement-title-row">
-              <h3 class="title-requirement">Requirement 3: Classes Management API</h3>
-                <div class="requirement-status-tag status-error">
+              <h3 class="title-requirement">REQ-03 · Student Management</h3>
+                <div class="requirement-status-tag status-success">
               <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="7.99961" cy="7.99998" r="6.4" fill="#C23539" fill-opacity="0.2"/>
-                <path d="M8 5.59998V7.99698" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10.394V10.3995" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="7.99961" cy="7.99998" r="6.4" fill="#10A363" fill-opacity="0.2"/>
+                <path d="M5.59961 8.00002L7.19961 9.60002L10.3996 6.40002" stroke="#19C379" stroke-width="1.28" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              <span>0/1</span>
+              <span>0/0</span>
             </div>
               </div>
               <p class="text-body-medium requirement-description">Proper error handling for API calls and invalid data scenarios.</p>
@@ -1480,54 +1421,36 @@ body {
 
             <div class="accordion-content">
             <div class="test-wrapper">
-<div class="test-card">
-                <div class="test-header">
-                  <h4 class="text-body-medium">TC003: getapiclasseswithvalidtoken</h4>
-                </div>
-                <div class="test-content">
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Code</div>
-                    <div class="test-field-value text-body">
-                      <a href="./TC003_getapiclasseswithvalidtoken.py" class="text-link">TC003_getapiclasseswithvalidtoken.py</a>
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Error</div>
-                    <div class="test-field-value text-body">`AssertionError: Login request failed: 401 Client Error: Unauthorized for url: http://localhost:8000/api/auth/login`</div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Test Visualization and Result</div>
-                    <div class="test-field-value text-body">
-                      <a href="[Link](https://www.testsprite.com/dashboard/mcp/tests/300b8716-4e7c-4ab5-8175-fdce991d16b5/47442c25-528e-4ec2-8d1b-a848839bd0b0)" class="text-link">View Results</a>
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Status</div>
-                    <div class="test-field-value">
-                      
-            <div class="status-wrapper">
-                <div class="status-icon">
-                    <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="7.99961" cy="7.99998" r="6.4" fill="#C23539" fill-opacity="0.2"/>
-<path d="M8 5.59998V7.99698" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M8 10.394V10.3995" stroke="#EF4146" stroke-width="1.38478" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>
-                </div>
-                <span class="text-body status-fail">Failed</span>
+
             </div>
-            
-                    </div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Severity</div>
-                    <div class="test-field-value text-body">N/A</div>
-                  </div>
-                  <div class="test-field">
-                    <div class="test-field-label text-body-medium">Analysis / Findings</div>
-                    <div class="test-field-value text-body">This test failed during the setup phase when attempting to acquire an authentication token via the `/api/auth/login` endpoint, resulting in a 401 Unauthorized error. This cascades the failure, preventing the actual test of `/api/classes` from executing.</div>
-                  </div>
-                </div>
+          </div>
+        </div>
+
+                <div class="requirement-wrapper accordion-item active">
+          <div class="accordion-header" onclick="toggleAccordion(this)">
+            <div class="requirement-content">
+                                          <div class="requirement-title-row">
+              <h3 class="title-requirement">REQ-04 · Teacher Management</h3>
+                <div class="requirement-status-tag status-success">
+              <svg width="18" height="18" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="7.99961" cy="7.99998" r="6.4" fill="#10A363" fill-opacity="0.2"/>
+                <path d="M5.59961 8.00002L7.19961 9.60002L10.3996 6.40002" stroke="#19C379" stroke-width="1.28" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <span>0/0</span>
+            </div>
               </div>
+              <p class="text-body-medium requirement-description">Proper error handling for API calls and invalid data scenarios.</p>
+            </div>
+            <div class="accordion-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M11.4276 6C11.9145 6 12.1687 6.61626 11.875 7.01439L11.8316 7.06689L8.40295 10.817C8.30455 10.9246 8.17364 10.9892 8.03476 10.9988C7.89589 11.0083 7.7586 10.9621 7.64865 10.8688L7.59493 10.817L4.16629 7.06689L4.11886 7.00814L4.088 6.96002L4.05714 6.90002L4.04743 6.87752L4.032 6.83564L4.01371 6.76814L4.008 6.73501L4.00229 6.69751L4 6.66189V6.58814L4.00286 6.55188L4.008 6.51438L4.01371 6.48188L4.032 6.41438L4.04743 6.37251L4.08743 6.29L4.12457 6.23375L4.16629 6.18313L4.22 6.13125L4.26401 6.0975L4.31886 6.06375L4.33944 6.05313L4.37772 6.03625L4.43944 6.01625L4.46972 6.01L4.50401 6.00375L4.53658 6.00125L11.4276 6Z" fill="var(--fg-secondary)"/>
+              </svg>
+            </div>
+          </div>
+
+            <div class="accordion-content">
+            <div class="test-wrapper">
+
             </div>
           </div>
         </div>
@@ -1548,7 +1471,7 @@ body {
         </div>
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Code Repo</div>
-          <div class="metadata-value text-body">backend (QSM Project)</div>
+          <div class="metadata-value text-body">N/A</div>
         </div>
         <div class="metadata-row">
           <div class="metadata-label text-body-medium">Test Results</div>
