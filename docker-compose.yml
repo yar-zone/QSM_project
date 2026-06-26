@@ -10,9 +10,11 @@ services:
     working_dir: /var/www/html
     volumes:
       - ./backend:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/bootstrap/cache
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=production
+      - APP_DEBUG=false
       - APP_KEY=${APP_KEY:-base64:M+05kN+/QFbhBslGf8KU4hCl5+dMa0kljWFSc/QVOFM=}
       - DB_CONNECTION=sqlite
       - SESSION_DRIVER=file
@@ -32,6 +34,7 @@ services:
     working_dir: /app
     volumes:
       - ./frontend:/app
+      - qsm-frontend-node-modules:/app/node_modules
     environment:
       - NODE_ENV=development
       - CHOKIDAR_USEPOLLING=true
@@ -65,3 +68,6 @@ services:
 networks:
   qsm-network:
     driver: bridge
+
+volumes:
+  qsm-frontend-node-modules:

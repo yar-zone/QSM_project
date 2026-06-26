@@ -9,8 +9,10 @@ RUN apk add --no-cache \
     libpng-dev \
     libxml2-dev \
     icu-dev \
+    sqlite-dev \
   && docker-php-ext-install -j$(nproc) \
     bcmath \
+    calendar \
     ctype \
     fileinfo \
     gd \
@@ -33,7 +35,8 @@ RUN composer install --no-interaction --no-autoloader --prefer-dist --no-dev
 COPY . .
 
 RUN composer install --no-interaction --prefer-dist --no-dev \
-  && composer dump-autoload --optimize
+  && composer dump-autoload --optimize \
+  && rm -rf bootstrap/cache/*.php
 
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

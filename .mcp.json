@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "supabase": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["supabase-mcp"]
+    }
+  }
+}

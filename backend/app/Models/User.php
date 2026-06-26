@@ -29,7 +29,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'plain_password',
         'role',
         'status',
         'phone',
@@ -55,7 +54,6 @@ class User extends Authenticatable
     public function setPasswordAttribute($value): void
     {
         $this->attributes['password'] = bcrypt($value);
-        $this->attributes['plain_password'] = $value;
     }
 
     public function teacher(): HasOne

@@ -9,115 +9,38 @@ async def run_test():
     context = None
 
     try:
-        # Start a Playwright session in asynchronous mode
         pw = await async_api.async_playwright().start()
 
-        # Launch a Chromium browser in headless mode with custom arguments
         browser = await pw.chromium.launch(
-            headless=True,
+            headless=False,
             args=[
-                "--window-size=1280,720",
-                "--disable-dev-shm-usage",
-                "--ipc=host",
-                "--single-process"
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
             ],
         )
 
-        # Create a new browser context (like an incognito window)
         context = await browser.new_context()
-        # Wider default timeout to match the agent's DOM-stability budget;
-        # auto-waiting Playwright APIs (expect, locator.wait_for) inherit this.
-        context.set_default_timeout(15000)
+        context.set_default_timeout(30000)
 
-        # Open a new page in the browser context
         page = await context.new_page()
 
-        # Interact with the page elements to simulate user flow
-        # -> navigate
-        await page.goto("http://localhost:5173")
-        try:
-            await page.wait_for_load_state("domcontentloaded", timeout=5000)
-        except Exception:
-            pass
-        
-        # -> Click the 'تسجيل الدخول' (Sign In) button in the page header to open the authentication (sign-in) page or form.
-        # تسجيل الدخول button
-        elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
-        await elem.click(timeout=10000)
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # بريدك@example.com email field
-        elem = page.locator('[id="email"]')
-        await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("admin@qsm.com")
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # •••••••• password field
-        elem = page.locator('[id="password"]')
-        await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password")
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # تسجيل الدخول button
-        elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
-        await elem.click(timeout=10000)
-        
-        # -> Navigate to the /auth URL (http://localhost:5173/auth) to check whether the authentication route exists and whether the auth page can be reached.
         await page.goto("http://localhost:5173/auth")
-        try:
-            await page.wait_for_load_state("domcontentloaded", timeout=5000)
-        except Exception:
-            pass
         
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', and click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # بريدك@example.com email field
-        elem = page.locator('[id="email"]')
-        await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("admin@qsm.com")
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', and click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # •••••••• password field
-        elem = page.locator('[id="password"]')
-        await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password")
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', and click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # تسجيل الدخول button
-        elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
-        await elem.click(timeout=10000)
-        
-        # -> click
-        # الرجوع للرئيسية link
-        elem = page.get_by_role('link', name='الرجوع للرئيسية', exact=True)
-        await elem.click(timeout=10000)
-        
-        # -> Click the 'تسجيل الدخول' (Sign In) button in the page header to open the authentication form so the login UI can be re-inspected and a sign-in attempt retried if appropriate.
-        # تسجيل الدخول button
-        elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
-        await elem.click(timeout=10000)
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # بريدك@example.com email field
-        elem = page.locator('[id="email"]')
-        await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("admin@qsm.com")
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # •••••••• password field
-        elem = page.locator('[id="password"]')
-        await elem.wait_for(state="visible", timeout=10000)
-        await elem.fill("password")
-        
-        # -> Fill the email field with 'admin@qsm.com', fill the password field with 'password123', then click the 'تسجيل الدخول' (Sign In) button to submit the form.
-        # تسجيل الدخول button
-        elem = page.get_by_role('button', name='تسجيل الدخول', exact=True)
-        await elem.click(timeout=10000)
-        
-        # --> Assertions to verify final state
-        # Assert: Verify the teacher list is displayed
+        await page.locator('[id="email"]').wait_for(state="visible", timeout=10000)
+        await page.locator('[id="email"]').fill("nur.quran.school@gmail.com")
 
-        await asyncio.sleep(5)
+        await page.locator('[id="password"]').fill("toumi1916")
 
+        await page.get_by_role('button', name='تسجيل الدخول').click()
+
+        await page.wait_for_url(re.compile("/dashboard"), timeout=30000)
+
+        await page.wait_for_timeout(2000)
+
+        print("Test passed successfully!")
+
+    except Exception as e:
+        print(f"ERROR: {e}")
     finally:
         if context:
             await context.close()
@@ -127,4 +50,3 @@ async def run_test():
             await pw.stop()
 
 asyncio.run(run_test())
-    
