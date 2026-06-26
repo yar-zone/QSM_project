@@ -10,6 +10,7 @@ RUN apk add --no-cache \
     libxml2-dev \
     icu-dev \
     sqlite-dev \
+    postgresql-dev \
   && docker-php-ext-install -j$(nproc) \
     bcmath \
     calendar \
@@ -21,10 +22,11 @@ RUN apk add --no-cache \
     pcntl \
     pdo \
     pdo_sqlite \
+    pdo_pgsql \
     xml \
     zip \
   && rm -rf /var/cache/apk/*
-
+  
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
