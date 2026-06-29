@@ -9,7 +9,7 @@ function extractArray<T>(data: unknown): T[] {
 }
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
   headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 })
 
