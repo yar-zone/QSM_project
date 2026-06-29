@@ -56,7 +56,7 @@ function NewTeacherPage() {
         phone: values.phone || undefined,
         qualification: values.qualification || undefined,
         specialization: values.specialization || undefined,
-      })
+      } as any)
       toast.success("تم إنشاء المعلم")
       navigate({ to: "/teachers" })
     } catch (err: any) {

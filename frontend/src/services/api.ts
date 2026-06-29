@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { AuthResponse, RegisterData, LoginCredentials, ApiResponse, PaginatedResponse, User, Student, Teacher, Classe, Level, Subject, Surah, MemorizationTracking, ExamRequest, ExamResult, Certificate, Announcement, Meeting, Attendance, Notification, AuditLog, Organizer, DashboardStats } from '@/types'
+import type { AuthResponse, RegisterData, LoginCredentials, ApiResponse, PaginatedResponse, User, Student, Teacher, Classe, Level, Subject, Surah, MemorizationTracking, ExamRequest, ExamResult, Certificate, Announcement, Meeting, Attendance, Notification, AuditLog, Organizer, DashboardStats, AttendanceClassReport } from '@/types'
 import { TOKEN_KEY, USER_KEY } from '@/lib/constants'
 
 function extractArray<T>(data: unknown): T[] {

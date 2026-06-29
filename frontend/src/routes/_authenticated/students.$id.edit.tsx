@@ -83,7 +83,7 @@ function EditStudentPage() {
         enrollment_date: values.enrollment_date || undefined,
         is_active: values.is_active,
         class_ids: values.class_ids || undefined,
-      })
+      } as any)
       toast.success("تم تحديث الطالب")
       navigate({ to: "/students" })
     } catch (err: any) {

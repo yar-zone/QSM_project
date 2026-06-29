@@ -41,15 +41,15 @@ function ClassesPage() {
 
   const { data: classes, isLoading } = useQuery({
     queryKey: ["classes"],
-    queryFn: classApi.list,
+    queryFn: () => classApi.list(),
   })
   const { data: levels } = useQuery({
     queryKey: ["levels"],
-    queryFn: levelApi.list,
+    queryFn: () => levelApi.list(),
   })
   const { data: teachers } = useQuery({
     queryKey: ["teachers"],
-    queryFn: teacherApi.list,
+    queryFn: () => teacherApi.list(),
   })
 
   const classesList = classes ?? []

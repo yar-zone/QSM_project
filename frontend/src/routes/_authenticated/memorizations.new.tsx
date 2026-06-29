@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useForm } from "react-hook-form"
+import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useState } from "react"
@@ -17,8 +17,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const schema = z.object({
-  student_id: z.coerce.number({ required_error: "Select a student" }),
-  teacher_id: z.coerce.number({ required_error: "Select a teacher" }),
+  student_id: z.coerce.number(),
+  teacher_id: z.coerce.number(),
   surah_id: z.coerce.number().optional().or(z.literal("")),
   juz: z.coerce.number().optional().or(z.literal("")),
   hizb: z.coerce.number().optional().or(z.literal("")),
@@ -55,14 +55,14 @@ function NewMemorizationPage() {
   })
 
   const { register, handleSubmit, formState: { errors }, setValue } = useForm<Values>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: { verses_memorized: 0, verses_revised: 0, start_date: new Date().toISOString().split("T")[0] },
   })
 
-  const onSubmit = async (values: Values) => {
+  const onSubmit: SubmitHandler<Values> = async (values) => {
     setSaving(true)
     try {
-      await memorizationApi.create(values)
+      await memorizationApi.create(values as any)
       toast.success("تم إنشاء سجل الحفظ")
       navigate({ to: "/memorizations" })
     } catch (err: any) {
@@ -78,7 +78,7 @@ function NewMemorizationPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader><CardTitle>تفاصيل الحفظ</CardTitle></CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="student_id">الطالب</Label>
               <Select onValueChange={(v) => setValue("student_id", Number(v))}>

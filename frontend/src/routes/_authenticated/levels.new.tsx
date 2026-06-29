@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useForm } from "react-hook-form"
+import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useState } from "react"
 import { z } from "zod"
@@ -33,7 +33,7 @@ function NewLevelPage() {
   const [saving, setSaving] = useState(false)
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<Values>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       name: "",
       description: "",
@@ -44,7 +44,7 @@ function NewLevelPage() {
 
   const isActive = watch("is_active")
 
-  const onSubmit = async (values: Values) => {
+  const onSubmit: SubmitHandler<Values> = async (values) => {
     setSaving(true)
     try {
       await levelApi.create({
@@ -77,7 +77,7 @@ function NewLevelPage() {
           <CardTitle>بيانات المستوى</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="name">الاسم</Label>
               <Input id="name" {...register("name")} />

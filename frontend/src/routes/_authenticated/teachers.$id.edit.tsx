@@ -63,7 +63,7 @@ function EditTeacherPage() {
         qualification: values.qualification || undefined,
         specialization: values.specialization || undefined,
         is_active: values.is_active,
-      })
+      } as any)
       toast.success("تم تحديث المعلم")
       navigate({ to: "/teachers" })
     } catch (err: any) {

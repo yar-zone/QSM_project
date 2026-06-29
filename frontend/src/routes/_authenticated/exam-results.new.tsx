@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { useForm } from "react-hook-form"
+import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useState } from "react"
@@ -45,19 +45,19 @@ function NewExamResultPage() {
   })
 
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<Values>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: { is_passed: false },
   })
 
-  const onSubmit = async (values: Values) => {
+  const onSubmit: SubmitHandler<Values> = async (values) => {
     setSaving(true)
     try {
       await examResultApi.create({
-        student_id: selectedStudent || undefined,
-        level_id: selectedLevel || undefined,
+        student_id: selectedStudent ? Number(selectedStudent) : undefined,
+        level_id: selectedLevel ? Number(selectedLevel) : undefined,
         ...values,
         marks_obtained: values.marks_obtained ? Number(values.marks_obtained) : undefined,
-      })
+      } as any)
       toast.success("تم إنشاء نتيجة الامتحان")
       navigate({ to: "/exam-results" })
     } catch (err: any) {
@@ -73,7 +73,7 @@ function NewExamResultPage() {
       <Card className="shadow-[var(--shadow-card)]">
         <CardHeader><CardTitle>تفاصيل النتيجة</CardTitle></CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="student_id">الطالب</Label>
               <Select onValueChange={(v) => setSelectedStudent(v)}>

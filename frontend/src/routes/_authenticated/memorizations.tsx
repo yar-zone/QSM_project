@@ -171,7 +171,7 @@ function MemorizationsPage() {
                             <DialogFooter>
                               <Button variant="outline" onClick={() => setEditId(null)}>إلغاء</Button>
                               <Button
-                                onClick={() => updateMutation.mutate({ id: m.id, data: { verses_memorized: Number(editForm.verses_memorized), verses_revised: Number(editForm.verses_revised), teacher_notes: editForm.teacher_notes || undefined, revision_level: editForm.revision_level || undefined, performance_score: editForm.performance_score ? Number(editForm.performance_score) : undefined } })}
+                                onClick={() => updateMutation.mutate({ id: m.id, data: { verses_memorized: Number(editForm.verses_memorized), verses_revised: Number(editForm.verses_revised), teacher_notes: editForm.teacher_notes || undefined, revision_level: (editForm.revision_level || undefined) as any, performance_score: editForm.performance_score ? Number(editForm.performance_score) : undefined } })}
                                 disabled={updateMutation.isPending}
                               >
                                 {updateMutation.isPending && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}

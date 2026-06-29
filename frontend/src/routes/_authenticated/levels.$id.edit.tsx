@@ -40,7 +40,7 @@ function EditLevelPage() {
   })
 
   const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<Values>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     values: level ? {
       name: level.name,
       description: level.description ?? "",
@@ -92,7 +92,7 @@ function EditLevelPage() {
           <CardTitle>بيانات المستوى</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit as any)} className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="name">الاسم</Label>
               <Input id="name" {...register("name")} />

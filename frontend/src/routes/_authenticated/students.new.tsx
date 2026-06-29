@@ -84,7 +84,7 @@ function NewStudentPage() {
         enrollment_date: values.enrollment_date || undefined,
         class_ids: values.class_ids || undefined,
         guardian_id: guardianId ? Number(guardianId) : undefined,
-      })
+      } as any)
       toast.success("تم إنشاء الطالب")
       navigate({ to: "/students" })
     } catch (err: any) {

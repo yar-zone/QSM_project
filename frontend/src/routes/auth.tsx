@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 import { Loader2, BookOpen, Home, Eye, EyeOff } from "lucide-react"
+import { z } from "zod"
 import { GoogleLogin } from "@react-oauth/google"
 import { toast } from "sonner"
 
@@ -12,6 +13,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: z.object({
+    mode: z.enum(["login", "register"]).optional().default("login"),
+  }),
   component: AuthPage,
 })
 

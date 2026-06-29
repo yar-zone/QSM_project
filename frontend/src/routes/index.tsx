@@ -55,10 +55,10 @@ function Landing() {
             <span className="font-display text-xl font-bold text-primary">نور القرآن</span>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/auth" search={{ mode: "login" }}>
+            <Link to="/auth" search={{ mode: "login" } as any}>
               <Button variant="ghost">تسجيل الدخول</Button>
             </Link>
-            <Link to="/auth" search={{ mode: "register" }}>
+            <Link to="/auth" search={{ mode: "register" } as any}>
               <Button>ابدأ الآن</Button>
             </Link>
           </div>
@@ -75,10 +75,10 @@ function Landing() {
             تتبع الحفظ، إجراء الامتحانات، إصدار الشهادات، متابعة الحضور واستضافة الاجتماعات — كل ذلك في مكان واحد آمن وجميل.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link to="/auth" search={{ mode: "register" }}>
+            <Link to="/auth" search={{ mode: "register" } as any}>
               <Button size="lg">إنشاء حسابك</Button>
             </Link>
-            <Link to="/auth" search={{ mode: "login" }}>
+            <Link to="/auth" search={{ mode: "login" } as any}>
               <Button size="lg" variant="outline">لدي حساب بالفعل</Button>
             </Link>
           </div>
