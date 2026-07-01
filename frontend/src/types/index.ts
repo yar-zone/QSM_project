@@ -118,13 +118,6 @@ export interface AnnouncementAttachment {
   id: number; announcement_id: number; file_path: string; file_type?: string; file_name?: string; created_at: string; updated_at: string
 }
 
-export interface Meeting {
-  id: number; organizer_id?: number; organizer?: User; teacher_id?: number; teacher?: Teacher
-  title: string; description?: string; platform: string; meeting_link?: string; meeting_id?: string
-  scheduled_at: string; duration_minutes: number; status: MeetingStatus; recording_url?: string
-  created_at: string; updated_at: string; participants?: MeetingParticipant[]
-}
-
 export interface MeetingParticipant {
   id: number; meeting_id: number; user_id: number; user?: User; role?: string
   joined_at?: string; left_at?: string; created_at: string; updated_at: string

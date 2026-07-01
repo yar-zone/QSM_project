@@ -14,7 +14,7 @@ return new class extends Migration
             $table->integer('hizb_count');
             $table->text('committee_notes')->nullable();
             $table->string('status')->default('pending');
-            $table->date('requested_date')->default(DB::raw('CURRENT_DATE'));
+            $table->date('requested_date')->default(DB::raw('(CURRENT_DATE)'));
             $table->foreignId('reviewed_by')->nullable()->constrained('users');
             $table->timestamp('reviewed_at')->nullable();
             $table->timestamps();

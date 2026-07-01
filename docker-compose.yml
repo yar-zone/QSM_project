@@ -1,73 +1,71 @@
 services:
+  mysql:
+    image: mysql:8.0
+    container_name: qsm-mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: qsm_password
+      MYSQL_DATABASE: qsm
+      MYSQL_USER: qsm_user
+      MYSQL_PASSWORD: qsm_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pqsm_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # ─── Laravel Backend ─────────────────────────────────────
-  qsm-backend:
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: qsm-backend
     restart: unless-stopped
-    working_dir: /var/www/html
-    volumes:
-      - ./backend:/var/www/html
-      - /var/www/html/vendor
-      - /var/www/html/bootstrap/cache
+    ports:
+      - "8000:8000"
     environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - APP_KEY=${APP_KEY:-base64:M+05kN+/QFbhBslGf8KU4hCl5+dMa0kljWFSc/QVOFM=}
-      - DB_CONNECTION=sqlite
-      - SESSION_DRIVER=file
-      - CACHE_STORE=file
-      - QUEUE_CONNECTION=sync
-      - LOG_CHANNEL=stderr
-    expose:
-      - "8000"
-    networks:
-      - qsm-network
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: qsm
+      DB_USERNAME: qsm_user
+      DB_PASSWORD: qsm_password
+      APP_ENV: production
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      LOG_CHANNEL: stderr
+      QUEUE_CONNECTION: sync
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - backend_storage:/var/www/html/storage
 
-  # ─── React Frontend (Vite Dev Server) ───────────────────
-  qsm-frontend:
-    image: node:22-alpine
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: qsm-frontend
     restart: unless-stopped
-    working_dir: /app
-    volumes:
-      - ./frontend:/app
-      - qsm-frontend-node-modules:/app/node_modules
-    environment:
-      - NODE_ENV=development
-      - CHOKIDAR_USEPOLLING=true
-    command: >
-      sh -c "
-        npm ci &&
-        npm run dev -- --host 0.0.0.0 --port 5173
-      "
-    expose:
-      - "5173"
-    depends_on:
-      - qsm-backend
-    networks:
-      - qsm-network
-
-  # ─── Nginx Reverse Proxy ────────────────────────────────
-  qsm-nginx:
-    image: nginx:alpine
-    container_name: qsm-nginx
-    restart: unless-stopped
-    volumes:
-      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - "80:80"
+      - "5173:5173"
+    environment:
+      VITE_API_PROXY_TARGET: http://backend:8000
+      CHOKIDAR_USEPOLLING: "true"
     depends_on:
-      - qsm-backend
-      - qsm-frontend
-    networks:
-      - qsm-network
-
-networks:
-  qsm-network:
-    driver: bridge
+      - backend
+    volumes:
+      - /app/node_modules
 
 volumes:
-  qsm-frontend-node-modules:
+  mysql_data:
+  backend_storage:

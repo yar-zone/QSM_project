@@ -22,8 +22,8 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate()
   const { isAuthenticated, loading } = useAuth()
-  const params = new URLSearchParams(window.location.search)
-  const [mode, setMode] = useState<"login" | "register">(params.get("mode") === "register" ? "register" : "login")
+  const { mode: searchMode } = Route.useSearch()
+  const [mode, setMode] = useState<"login" | "register">(searchMode)
 
   useEffect(() => {
     if (!loading && isAuthenticated && localStorage.getItem(TOKEN_KEY)) {

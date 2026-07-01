@@ -1,23 +1,15 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 
-import { authApi } from "@/services/api"
-import { TOKEN_KEY, USER_KEY } from "@/lib/constants"
+import { TOKEN_KEY } from "@/lib/constants"
 import { DashboardShell } from "@/components/layout/dashboard-shell"
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: async () => {
+  beforeLoad: () => {
     const token = localStorage.getItem(TOKEN_KEY)
-    if (!token) throw redirect({ to: "/auth", search: { mode: "login" } as any })
-    try {
-      const user = await authApi.me()
-      localStorage.setItem(USER_KEY, JSON.stringify(user))
-      return { user }
-    } catch {
-      localStorage.removeItem(TOKEN_KEY)
-      localStorage.removeItem(USER_KEY)
-      window.dispatchEvent(new Event("auth:logout"))
+    if (!token) {
       throw redirect({ to: "/auth", search: { mode: "login" } as any })
     }
+    // Don't fetch user here — useAuth() in DashboardShell handles it
   },
   component: AuthenticatedLayout,
 })

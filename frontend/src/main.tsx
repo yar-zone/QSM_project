@@ -8,7 +8,16 @@ import './styles.css'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 2, // 2 minutes — dashboard data doesn't change every second
+      gcTime: 1000 * 60 * 5,    // keep cached data for 5 minutes
+      retry: 1,                  // only retry once on failure
+      refetchOnWindowFocus: false,
+    },
+  },
+})
 
 const router = createRouter({
   routeTree,

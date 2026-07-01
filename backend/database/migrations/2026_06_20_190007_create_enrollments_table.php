@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students')->cascadeOnDelete();
             $table->foreignId('class_id')->constrained('classes')->cascadeOnDelete();
-            $table->date('enrolled_date')->default(DB::raw('CURRENT_DATE'));
+            $table->date('enrolled_date')->default(DB::raw('(CURRENT_DATE)'));
             $table->string('status')->default('active');
             $table->timestamps();
             $table->unique(['student_id', 'class_id']);
