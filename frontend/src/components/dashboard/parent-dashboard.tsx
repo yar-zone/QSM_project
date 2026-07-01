@@ -1,3 +1,11 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Parent dashboard — shows progress data for the parent's children.
+// Features child selector cards, per-child stats (memorized, revised,
+// avg score, sessions), memorization sessions, attendance overview,
+// exam results, certificates list, quick actions, announcements.
+// Handles no-children edge case with friendly empty state.
+// ─────────────────────────────────────────────────────────────────────
+
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { useState } from "react"

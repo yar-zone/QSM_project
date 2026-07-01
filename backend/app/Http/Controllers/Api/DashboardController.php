@@ -1,5 +1,15 @@
 <?php
 
+// ─── [FILE PURPOSE] ────────────────────────────────────────────────────
+// Unified dashboard API endpoint — returns role-specific aggregated data.
+// Each role gets a different data shape:
+//   admin/organizer → counts (students, teachers, classes) + attendance stats
+//   teacher          → my_classes, my_students
+//   student          → memorized verses, sessions, avg performance
+//   parent           → children_stats with per-child memorization + attendance
+// Uses cache (Cache::remember, 5 min TTL) to reduce DB load.
+// ────────────────────────────────────────────────────────────────────────
+
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;

@@ -1,3 +1,10 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// @deprecated 🗑️  Replaced by teacher-dashboard.tsx, student-dashboard.tsx,
+// and parent-dashboard.tsx. This was a placeholder showing only module
+// description cards. The new role-specific dashboards are fully featured.
+// TODO: Remove this file after verifying new dashboards are stable.
+// ─────────────────────────────────────────────────────────────────────
+
 import { BookOpen, Award, CalendarCheck, Video, Bell, BarChart3, type LucideIcon } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { PageHeader } from "@/components/dashboard/page-header"

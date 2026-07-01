@@ -1,3 +1,10 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Organizer dashboard — school management view.
+// Similar to AdminDashboard but without total_users or audit logs access.
+// Shows: 4 stats cards, date-range attendance overview, class reports table,
+// management quick links, academic quick links, recent announcements.
+// ─────────────────────────────────────────────────────────────────────
+
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { useState } from "react"

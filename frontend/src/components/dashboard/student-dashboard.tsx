@@ -1,3 +1,11 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Student dashboard — shows the student's own progress data.
+// Sections: 4 stat cards (memorized, revised, avg score, sessions),
+// memorization progress (surah/juz with performance bars),
+// attendance overview with 4-status mini-grid,
+// exam results with pass/fail breakdown, quick actions, announcements.
+// ─────────────────────────────────────────────────────────────────────
+
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import {

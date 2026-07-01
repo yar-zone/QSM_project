@@ -1,3 +1,10 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Role-based dashboard dispatcher route.
+// Reads the user's primaryRole from useAuth() and renders the appropriate
+// dashboard component. Defaults to StudentDashboard for unknown roles.
+// This is the entry point when any logged-in user visits /dashboard.
+// ─────────────────────────────────────────────────────────────────────
+
 import { createFileRoute } from "@tanstack/react-router"
 
 import { useAuth } from "@/hooks/use-auth"

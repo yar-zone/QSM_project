@@ -1,3 +1,12 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Shared constants and label maps used across the frontend.
+// Includes:
+// - localStorage keys (TOKEN_KEY, USER_KEY)
+// - Human-readable Arabic labels for roles, attendance statuses,
+//   exam statuses, meeting statuses, announcement categories, revision levels
+// These maps are used in table cells, badges, and dropdowns throughout the app.
+// ─────────────────────────────────────────────────────────────────────
+
 export const TOKEN_KEY = 'qsm_token'
 export const USER_KEY = 'qsm_user'
 export const ROLE_LABELS: Record<string, string> = { admin: 'مدير', organizer: 'منظم', teacher: 'معلم', student: 'طالب' }

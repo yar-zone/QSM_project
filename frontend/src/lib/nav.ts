@@ -1,3 +1,13 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Sidebar navigation configuration.
+// NAV_ITEMS defines every sidebar link with:
+// - title (Arabic label)
+// - to (TanStack Router path)
+// - icon (lucide-react icon)
+// - roles (which roles can see this link)
+// navForRole() filters the list to only show relevant links for the current user.
+// ─────────────────────────────────────────────────────────────────────
+
 import {
   LayoutDashboard, UserCheck, User, Users, GraduationCap, BookOpen,
   LayoutList, BookMarked, ClipboardList, Award, Bell,

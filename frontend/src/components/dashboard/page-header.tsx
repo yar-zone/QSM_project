@@ -1,3 +1,9 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Reusable page header component used by ALL dashboard views.
+// Renders: title + optional description + optional action buttons (children)
+// Includes a decorative gradient underline bar.
+// ─────────────────────────────────────────────────────────────────────
+
 import type { ReactNode } from "react";
 
 interface PageHeaderProps {

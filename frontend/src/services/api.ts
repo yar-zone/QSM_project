@@ -1,7 +1,18 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Central API service layer for the entire frontend.
+// - One Axios instance with base URL, auth token injection, and 401 handling
+// - Organized by entity: authApi, dashboardApi, studentApi, teacherApi, etc.
+// - All API methods return typed promises
+// ─────────────────────────────────────────────────────────────────────
+
 import axios from 'axios'
 import type { AuthResponse, RegisterData, LoginCredentials, ApiResponse, PaginatedResponse, User, Student, Teacher, Classe, Level, Subject, Surah, MemorizationTracking, ExamRequest, ExamResult, Certificate, Announcement, Meeting, Attendance, Notification, AuditLog, Organizer, DashboardStats, AttendanceClassReport } from '@/types'
 import { TOKEN_KEY, USER_KEY } from '@/lib/constants'
 
+/**
+ * Safely extracts an array from a paginated API response.
+ * Laravel pagination wraps arrays in { data: [...] }, so this unwraps it.
+ */
 function extractArray<T>(data: unknown): T[] {
   if (Array.isArray(data)) return data
   if (data && typeof data === 'object' && 'data' in (data as any) && Array.isArray((data as any).data)) return (data as any).data

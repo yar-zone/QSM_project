@@ -1,3 +1,11 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Admin dashboard — full school overview.
+// Shows: 6 stats cards (students, teachers, classes, levels, users, pending),
+// date-range-driven attendance overview with 4-status breakdown,
+// class attendance reports table, management + academic quick links,
+// and recent announcements.
+// ─────────────────────────────────────────────────────────────────────
+
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { useState } from "react"

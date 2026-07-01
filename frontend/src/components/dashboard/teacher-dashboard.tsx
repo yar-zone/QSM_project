@@ -1,3 +1,10 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Teacher dashboard — shows the teacher's own classes and student data.
+// Sections: 4 stats cards (my classes, my students, total verses, pass rate),
+// my classes list, recent memorization sessions, attendance overview with
+// 4-status mini-grid, exam results summary, quick actions, announcements.
+// ─────────────────────────────────────────────────────────────────────
+
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import {

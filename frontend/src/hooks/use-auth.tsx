@@ -1,3 +1,11 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Global authentication context provider + useAuth hook.
+// - Stores user + token in localStorage for persistence across refreshes
+// - Auto-fetches /auth/me on load if token exists
+// - Exposes login, register, signOut, refresh, and role boolean helpers
+// - Listens for 'auth:logout' custom event (dispatched by API 401 handler)
+// ─────────────────────────────────────────────────────────────────────
+
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { authApi } from '@/services/api'
 import { TOKEN_KEY, USER_KEY } from '@/lib/constants'

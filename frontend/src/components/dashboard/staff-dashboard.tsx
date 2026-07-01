@@ -1,3 +1,10 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// @deprecated 🗑️  Replaced by admin-dashboard.tsx and organizer-dashboard.tsx.
+// This component used to serve both admin and organizer roles.
+// It's still imported in dashboard.tsx but no longer rendered for any role.
+// TODO: Remove this file after verifying admin/organizer dashboards are stable.
+// ─────────────────────────────────────────────────────────────────────
+
 import { useQuery } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 import { Users, GraduationCap, UserCog, Clock, UserCheck, BookOpen, TrendingUp, CheckCircle2, XCircle, ShieldCheck } from "lucide-react"

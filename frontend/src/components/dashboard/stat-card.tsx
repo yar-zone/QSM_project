@@ -1,3 +1,10 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Reusable stat card component for dashboard metrics.
+// Props: label, value, icon (lucide), optional hint text, loading state
+// with Skeleton, and a CSS animation delay class name.
+// Used by student-dashboard.tsx and legacy staff-dashboard.tsx.
+// ─────────────────────────────────────────────────────────────────────
+
 import type { LucideIcon } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"

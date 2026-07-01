@@ -1,3 +1,12 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// Role definitions and helpers for the 5 user roles.
+// - APP_ROLES: canonical list of all roles
+// - ROLE_PRIORITY: priority order for picking a single "primary" role
+// - getPrimaryRole(): chooses the highest-priority role from a user's list
+// - SELF_SIGNUP_ROLES: which roles users can register as (not admin/organizer)
+// - isStaffRole(): checks if a role is admin or organizer
+// ─────────────────────────────────────────────────────────────────────
+
 export const APP_ROLES = [
   "admin",
   "organizer",

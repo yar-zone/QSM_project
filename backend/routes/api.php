@@ -1,5 +1,12 @@
 <?php
 
+// ─── [FILE PURPOSE] ────────────────────────────────────────────────────
+// Defines ALL API routes for the QSM backend.
+// Organized from least restrictive (public auth) to most restrictive
+// (admin-only). Each route group uses middleware('role:...') for
+// role-based access control.
+// ────────────────────────────────────────────────────────────────────────
+
 use App\Http\Controllers\Api\AnnouncementController;
 use App\Http\Controllers\Api\AttendanceController;
 use App\Http\Controllers\Api\AuditLogController;

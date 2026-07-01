@@ -1,5 +1,15 @@
 <?php
 
+// ─── [FILE PURPOSE] ────────────────────────────────────────────────────
+// Handles all authentication: login, register, email verification,
+// Google Sign-In, logout, password change, and current user retrieval.
+// Key flows:
+//   1. Register → send 6-digit code via email → verify → create pending user
+//   2. Login → check credentials + active status → return Sanctum token
+//   3. Google Login → verify JWT → create/login user as parent role
+//   4. Email verification stores codes in DB with 10-min expiry
+// ────────────────────────────────────────────────────────────────────────
+
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\EmailHelper;

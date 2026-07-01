@@ -1,3 +1,13 @@
+// ─── [FILE PURPOSE] ─────────────────────────────────────────────────
+// All TypeScript type/interface definitions for the QSM frontend.
+// Mirrors the backend's Eloquent models one-to-one.
+// Organized as:
+//   1. Enums/Union types (Role, Status, etc.)
+//   2. Core entity interfaces (User, Student, Teacher, Classe, etc.)
+//   3. Request/Response types (LoginCredentials, AuthResponse, etc.)
+//   4. Aggregated data types (DashboardStats, ChildrenStats, etc.)
+// ─────────────────────────────────────────────────────────────────────
+
 export type Role = 'admin' | 'organizer' | 'teacher' | 'student' | 'parent'
 export type UserStatus = 'pending' | 'active' | 'inactive'
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused'
