@@ -13,6 +13,7 @@ use Firebase\JWT\JWT;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -188,7 +189,11 @@ class AuthController extends Controller
         try {
             Mail::to($email)->send(new VerificationCodeMail($code, $name));
         } catch (\Exception $e) {
-            // Log silently — mail config may not be set up
+            Log::error('Failed to send verification email: ' . $e->getMessage(), [
+                'email' => $email,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
         }
     }
 
